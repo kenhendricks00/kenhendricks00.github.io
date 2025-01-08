@@ -13,8 +13,8 @@ const SlideWrapper = ({ children, delay = 0 }) => {
 
   return (
     <div
-      className={`transform transition-all duration-1000 ease-out
-        ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}
+      className={`transform transition-all duration-1000
+        ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
     >
       {children}
     </div>
