@@ -4,6 +4,7 @@ import Timeline from './components/Timeline';
 import Portfolio from './components/Portfolio';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import SlideWrapper from './components/SlideWrapper';
 
 function App() {
 	const [theme, setTheme] = useState(null);
@@ -73,11 +74,25 @@ function App() {
       </button>
       <div className="bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-300 min-h-screen font-inter">
         <div className="max-w-5xl w-11/12 mx-auto">
-          <Intro />
-          <Portfolio />
-          <Timeline />
-          <Contact />
-          <Footer />
+          <SlideWrapper delay={0}>
+            <Intro />
+          </SlideWrapper>
+          
+          <SlideWrapper delay={200}>
+            <Portfolio />
+          </SlideWrapper>
+          
+          <SlideWrapper delay={400}>
+            <Timeline />
+          </SlideWrapper>
+          
+          <SlideWrapper delay={600}>
+            <Contact />
+          </SlideWrapper>
+          
+          <SlideWrapper delay={800}>
+            <Footer />
+          </SlideWrapper>
         </div>
       </div>
     </>
