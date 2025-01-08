@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥚</text></svg>"
+    />
+    <style>
+        a.kufi-button {
+      background-color: #29abe0;
+      border: 0 #fff !important;
+      border-radius: 7px;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+      color: #fff;
+      cursor: pointer;
+      display: inline-block !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      line-height: 36px !important;
+      min-width: 150px;
+      overflow-wrap: break-word;
+      padding: 0 12px !important;
+      text-align: center !important;
+      text-decoration: none;
+      text-shadow: none;
+      vertical-align: middle;
+    }
+
+    .kufi-right {
+      bottom: 15px;
+      min-width: 0 !important;
+      position: fixed;
+      right: 10px;
+    }
+
+    span.kufitext {
+      text-wrap: none;
+      letter-spacing: -0.15px !important;
+      line-height: 33px !important;
+      padding: 0;
+      text-align: center;
+      text-shadow: 0 1px 1px rgba(34, 34, 34, 0.05);
+      vertical-align: middle;
+    }
+
+    .kufitext img.kufiimg {
+      -webkit-animation: kufi-wiggle 3s infinite;
+      animation: kufi-wiggle 3s infinite;
+      display: initial;
+      height: 15px !important;
+      width: 22px !important;
+    }
+
+    .kufiimg:after,
+    img.kufiimg {
+      border: none;
+      margin-top: 0;
+      vertical-align: middle;
+    }
+    
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      .bg {
+        background: linear-gradient(45deg, #b87ad3, #90cfec);
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -2000;
+      }
+
+      .bg-area li {
+        position: absolute;
+        list-style: none;
+        bottom: -150px;
+        left: 5%;
+        font-size: 5rem;
+        animation: spin 20s Linear infinite;
+      }
+
+      .bg-area li:nth-child(2) {
+        left: 10%;
+        animation-delay: 2s;
+        animation-duration: 15s;
+      }
+
+      .bg-area li:nth-child(3) {
+        left: 20%;
+        animation-delay: 4s;
+      }
+
+      .bg-area li:nth-child(4) {
+        left: 30%;
+        animation-delay: 2s;
+      }
+
+      .bg-area li:nth-child(5) {
+        left: 40%;
+        animation-delay: 6s;
+        animation-duration: 30s;
+      }
+
+      .bg-area li:nth-child(6) {
+        left: 50%;
+        animation-delay: 2s;
+      }
+
+      .bg-area li:nth-child(7) {
+        left: 60%;
+        animation-delay: 3s;
+      }
+
+      .bg-area li:nth-child(8) {
+        left: 70%;
+        animation-delay: 4s;
+        animation-duration: 25s;
+      }
+
+      .bg-area li:nth-child(9) {
+        left: 80%;
+        animation-delay: 8s;
+        animation-duration: 30s;
+      }
+
+      .bg-area li:nth-child(9) {
+        left: 90%;
+        animation-delay: 1s;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: translateY(-800px) rotate(360deg);
+          opacity: 0;
+        }
+      }
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+      #pet-container {
+        font-size: 20rem; /* Adjust the size as needed */
+        margin-bottom: 1rem; /* Add spacing between the pet icon and buttons */
+        position: relative;
+      }
+      .overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        opacity: 0;
+      }
+      .wiggle {
+        animation: wiggle 0.5s infinite;
+      }
+      @keyframes wiggle {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        25% {
+          transform: rotate(5deg);
+        }
+        75% {
+          transform: rotate(-5deg);
+        }
+      }
+      .overlay-sunglasses {
+        position: absolute;
+        top: -45%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 10rem;
+        opacity: 1;
+        pointer-events: none; /* Prevent the overlay from blocking interactions */
+      }
+      .overlay-tombstone {
+        position: absolute;
+        top: -15%;
+        left: 0%;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        opacity: 1;
+        pointer-events: none; /* Prevent the overlay from blocking interactions */
+      }
+      .overlay-bow {
+        position: absolute;
+        top: -40%;
+        left: 7%;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 5rem;
+        opacity: 1;
+        pointer-events: none; /* Prevent the overlay from blocking interactions */
+        transform: rotate(15deg); /* Adjust the rotation angle as needed */
+      }
+      .sleeping-overlay {
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        opacity: 0.7;
+        animation: sleep 1s infinite alternate-reverse;
+      }
+      @keyframes sleep {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-20px);
+          opacity: 0.7;
+        }
+      }
+    </style>
+    <title>Virtual Pet Simulator</title>
+  </head>
+  <body>
+    <div class="mx-auto bg-white p-6 rounded-lg shadow-md">
+                        <a
+      href="https://kenhendricks.me"
+      class="absolute top-0 left-12 p-2 text-white rounded-br-lg rounded-bl-lg w-20 h-20 text-center justify-content text-4xl font-inter pt-4 transform transition duration-500 ease-in-out hover:-translate-y-1"
+      style="
+        background-color: rgb(28 25 23 / var(--tw-bg-opacity));
+        font-weight: bold;
+      "
+      >KH</a
+    >
+      <div class="bg">
+        <ul class="bg-area">
+          <li>🥚</li>
+          <li>🥚</li>
+          <li>🥚</li>
+          <li>🐣</li>
+          <li>🐣</li>
+          <li>🐥</li>
+          <li>🐥</li>
+          <li>🐓</li>
+          <li>🐓</li>
+        </ul>
+      </div>
+      <div
+        id="pet-name"
+        onclick="changePetName()"
+        class="text-4xl font-semibold cursor-pointer"
+      >
+        <span id="name"
+          ><div class="death-alert">
+            <div class="sickness-alert">Fluffy</div>
+          </div></span
+        >
+      </div>
+      <div id="pet-container" class="text-6xl mb-4 cursor-pointer">
+        🥚
+        <div class="overlay-sunglasses"></div>
+        <div class="overlay-bow"></div>
+        <div class="overlay-tombstone"></div>
+      </div>
+      <div class="text-center py-6">
+        <!-- Add this section for happiness display and progress bar -->
+        <div class="mb-4">
+          Happiness: <span id="happiness">100</span>
+          <div class="bg-gray-300 h-4 rounded-full mt-1">
+            <div
+              id="happiness-progress"
+              class="h-full bg-yellow-500 rounded-full"
+            ></div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          Cleanliness: <span id="cleanliness">100</span>
+          <div class="bg-gray-300 h-4 rounded-full mt-1">
+            <div
+              id="cleanliness-progress"
+              class="h-full bg-green-500 rounded-full"
+            ></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          Energy: <span id="energy">100</span>
+          <div class="bg-gray-300 h-4 rounded-full mt-1">
+            <div
+              id="energy-progress"
+              class="h-full bg-blue-500 rounded-full"
+            ></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          Hunger: <span id="hunger">0</span>
+          <div class="bg-gray-300 h-4 rounded-full mt-1">
+            <div
+              id="hunger-progress"
+              class="h-full bg-purple-500 rounded-full"
+            ></div>
+          </div>
+        </div>
+        <div class="flex justify-center mt-4 space-x-1 pb-2">
+          <button
+            id="feed-btn"
+            class="flex-auto px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            🐛
+          </button>
+          <button
+            id="play-btn"
+            class="flex-auto px-4 py-2 bg-green-500 text-white rounded"
+          >
+            ⚽
+          </button>
+          <button
+            id="bathe-btn"
+            class="flex-auto px-4 py-2 bg-yellow-500 text-white rounded"
+          >
+            🧼
+          </button>
+          <button
+            id="sleep-btn"
+            class="flex-auto px-4 py-2 bg-purple-500 text-white rounded"
+          >
+            🛏️
+          </button>
+          <button
+            id="treat-sick-btn"
+            class="flex-auto px-4 py-2 bg-red-500 text-white rounded"
+          >
+            💉
+          </button>
+        </div>
+      </div>
+    </div>
+    <a
+      class="kufi-button kufi-right"
+      href="https://ko-fi.com/kenhendricks"
+      target="_blank"
+      rel="noreferrer noopener external"
+      title=""
+      ><span class="kufitext"
+        ><img
+          src="https://storage.ko-fi.com/cdn/cup-border.png"
+          alt="support"
+          class="kufiimg"
+        />
+        Support</span
+      ></a
+    >
+    <script src="script.js"></script>
+  </body>
+</html>
