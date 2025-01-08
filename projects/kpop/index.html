@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GuessThatKpop - Your daily K-pop guessing puzzle!</title>
+    <!-- Add Tailwind CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" type="image/jpg" href="./img/favicon.ico" />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+      .font-bold {
+        font-weight: bold;
+      }
+
+      /* Add style for autocomplete suggestions */
+      .autocomplete-item {
+        line-height: 2;
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #ccc;
+      }
+
+      /* Style for the hovered suggestion */
+      .autocomplete-item:hover {
+        background-color: #ddd;
+        font-weight: bold;
+      }
+
+      .selected-suggestion {
+        font-weight: bold;
+      }
+
+      /* New styles for answer-container */
+      #answer-container {
+        max-width: 400px; /* Set a maximum width for the answer container */
+      }
+
+      .container-gap {
+        margin: -0.5rem; /* Adjust this value to control the gap */
+      }
+
+      .container-gap > div {
+        margin: 0.5rem; /* Adjust this value to control the gap */
+      }
+
+      #question-container {
+        width: 800px; /* You can adjust this value as needed */
+        overflow-y: visible;
+      }
+
+      #answer-container {
+        width: 400px; /* You can adjust this value as needed */
+        height: 500px;
+        overflow-y: auto;
+      }
+
+      a.kufi-button {
+        background-color: #29abe0;
+        border: 0 #fff !important;
+        border-radius: 7px;
+        box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+        color: #fff;
+        cursor: pointer;
+        display: inline-block !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 36px !important;
+        min-width: 150px;
+        overflow-wrap: break-word;
+        padding: 0 12px !important;
+        text-align: center !important;
+        text-decoration: none;
+        text-shadow: none;
+        vertical-align: middle;
+      }
+
+      .kufi-right {
+        bottom: 10px;
+        min-width: 0 !important;
+        position: fixed;
+        right: 10px;
+      }
+
+      span.kufitext {
+        text-wrap: none;
+        letter-spacing: -0.15px !important;
+        line-height: 33px !important;
+        padding: 0;
+        text-align: center;
+        text-shadow: 0 1px 1px rgba(34, 34, 34, 0.05);
+        vertical-align: middle;
+      }
+
+      .kufitext img.kufiimg {
+        -webkit-animation: kufi-wiggle 3s infinite;
+        animation: kufi-wiggle 3s infinite;
+        display: initial;
+        height: 15px !important;
+        width: 22px !important;
+      }
+
+      .kufiimg:after,
+      img.kufiimg {
+        border: none;
+        margin-top: 0;
+        vertical-align: middle;
+      }
+
+      #autocomplete-suggestions {
+        max-height: 150px; /* Set the maximum height for the suggestion list */
+        overflow-y: auto; /* Enable vertical scrolling if the list exceeds the max-height */
+      }
+
+      .guess-hint {
+        background-color: rgba(0, 0, 0, 0.4);
+        border-bottom-right-radius: 5px;
+        color: #eee;
+        font-size: 14px;
+        font-weight: 700;
+        left: 0;
+        padding: 5px 10px 7px;
+        position: absolute;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body onload="startTimer()" class="bg-gray-900 text-white">
+              <a
+      href="https://kenhendricks.me"
+      class="absolute top-0 left-12 p-2 bg-white rounded-br-lg rounded-bl-lg w-20 h-20 text-center justify-content text-4xl font-inter pt-4 transform transition duration-500 ease-in-out hover:-translate-y-1"
+      style="
+        font-weight: bold;color: #111827
+      "
+      >KH</a
+    >
+    <!-- Updated body class to set the background color and text color for dark mode -->
+    <div class="container mx-auto py-8">
+      <div class="flex justify-center">
+        <div class="flex flex-wrap container-gap">
+          <div
+            id="question-container"
+            class="flex-1 mx-auto max-w-4xl bg-gray-800 p-6 rounded-lg shadow-md"
+          >
+            <!-- Updated background color to gray-800 for dark mode -->
+            <h2 class="text-2xl font-bold mb-4">
+              <a class="logo-link" href="/"
+                ><span
+                  ><img
+                    src="./img/logo.png"
+                    alt="logo"
+                    style="height: 32px"
+                    class="inline"
+                  />&nbsp;</span
+                >GuessThatKpop</a
+              >
+            </h2>
+            <p class="text-gray-300 text-md mb-2 text-center">
+              Game #<span id="question-text">000</span>
+            </p>
+            <div id="image-container" class="mb-4 relative">
+              <img
+                id="answer-image"
+                src=""
+                alt="Answer Image"
+                class="rounded-lg shadow-md"
+              />
+              <!-- Add the guess-hint element here -->
+              <div
+                id="guess-hint"
+                class="guess-hint"
+                style="display: none"
+              ></div>
+            </div>
+            <!-- Button Row -->
+            <div class="flex justify-center mt-4 space-x-1 pb-2">
+              <!-- Button 1 -->
+              <button
+                id="button-1"
+                class="guess-button bg-gray-900 text-white py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 font-bold"
+              >
+                1
+              </button>
+              <!-- Button 2 to 5 (disabled initially) -->
+              <button
+                id="button-2"
+                class="guess-button btn-guess bg-gray-900 text-white py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                2
+              </button>
+              <button
+                id="button-3"
+                class="guess-button btn-guess bg-gray-900 text-white py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                3
+              </button>
+              <button
+                id="button-4"
+                class="guess-button btn-guess bg-gray-900 text-white py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                4
+              </button>
+              <button
+                id="button-5"
+                class="guess-button btn-guess bg-gray-900 text-white py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                5
+              </button>
+              <!-- Button 6 (hidden initially) -->
+              <button
+                id="button-6"
+                class="guess-button btn-guess bg-gray-900 text-white py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 opacity-50 cursor-not-allowed"
+                disabled
+              >
+                6
+              </button>
+            </div>
+            <div id="guesses">
+              <p class="text-gray-300 text-xl mb-4 text-center">
+                <span id="guesses-remaining">6</span>
+                <span id="guesses-text">guesses remaining!</span>
+              </p>
+            </div>
+            <p id="game-over"></p>
+            <div class="relative">
+              <input
+                type="text"
+                id="answer-input"
+                placeholder="Search for a Song..."
+                class="w-full border border-gray-600 rounded-md py-3 px-4 text-xl focus:outline-none focus:border-blue-500 bg-gray-700 text-white"
+                <!--
+                Updated
+                background
+                and
+                text
+                color
+                for
+                dark
+                mode
+                --
+              />
+              <!-- Suggestions will be displayed here -->
+              <div
+                id="autocomplete-suggestions"
+                class="autocomplete-items rounded-b-lg bg-white text-black absolute left-0 right-0 z-10"
+              ></div>
+            </div>
+            <div class="flex gap-2">
+              <button
+                onclick="checkAnswer()"
+                id="submit-answer-button"
+                class="flex-auto mt-4 bg-blue-500 text-white font-semibold py-3 px-6 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                Submit Answer
+              </button>
+              <!-- Add Skip Button -->
+              <button
+                id="skip-button"
+                onclick="skipGuess()"
+                class="flex-auto mt-4 bg-gray-500 text-white font-semibold py-3 px-6 rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-600"
+              >
+                Skip
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="w-6 h-6 inline"
+                >
+                  <path
+                    d="M5.055 7.06c-1.25-.714-2.805.189-2.805 1.628v8.123c0 1.44 1.555 2.342 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.342 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256L14.805 7.06C13.555 6.346 12 7.25 12 8.688v2.34L5.055 7.06z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="">
+            <!-- Answer Container -->
+            <div
+              id="answer-container"
+              class="relative flex-1 mx-auto max-w-lg bg-gray-800 p-6 rounded-lg shadow-md"
+            >
+              <h2 class="text-2xl font-bold mb-4">Guesses</h2>
+              <!-- List of attempted guesses -->
+              <div id="attempts-container" class="mb-4">
+                <!-- Add the class "wrong-guess-border" to hide the border initially -->
+                <ul
+                  id="attempts-list"
+                  class="text-md text-gray-300 text-left wrong-guess-border rounded-lg p-4"
+                ></ul>
+              </div>
+              <div
+                class="absolute inset-x-0 bottom-5 text-center content-center"
+              >
+                <p class="text-gray-300 text-lg mt-4 text-center">
+                  <!-- Updated text color to gray-300 for dark mode -->
+                  New Music Video In: <br /><span id="timer" class="text-2xl"
+                    >00h 00m 00s</span
+                  >
+                </p>
+              </div>
+            </div>
+            <p class="text-gray-300 text-sm mt-1 text-center">
+              © 2023 Kenneth Hendricks. All rights reserved.
+            </p>
+            <div class="flex flex-wrap justify-center gap-2">
+              <a
+                href="https://twitter.com/KenHendricksJr"
+                class="bg-stone-400 p-2 font-semibold text-white inline-flex items-center space-x-2 rounded-full"
+                ><svg
+                  class="w-5 h-5 fill-current"
+                  role="img"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                  ></path></svg></a
+              ><a
+                href="https://linkedin.com/in/kennethhendricksjr"
+                class="bg-stone-400 p-2 font-semibold text-white inline-flex items-center space-x-2 rounded-full"
+                ><svg
+                  class="w-5 h-5 fill-current"
+                  role="img"
+                  viewBox="0 0 256 256"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g>
+                    <path
+                      d="M218.123122,218.127392 L180.191928,218.127392 L180.191928,158.724263 C180.191928,144.559023 179.939053,126.323993 160.463756,126.323993 C140.707926,126.323993 137.685284,141.757585 137.685284,157.692986 L137.685284,218.123441 L99.7540894,218.123441 L99.7540894,95.9665207 L136.168036,95.9665207 L136.168036,112.660562 L136.677736,112.660562 C144.102746,99.9650027 157.908637,92.3824528 172.605689,92.9280076 C211.050535,92.9280076 218.138927,118.216023 218.138927,151.114151 L218.123122,218.127392 Z M56.9550587,79.2685282 C44.7981969,79.2707099 34.9413443,69.4171797 34.9391618,57.260052 C34.93698,45.1029244 44.7902948,35.2458562 56.9471566,35.2436736 C69.1040185,35.2414916 78.9608713,45.0950217 78.963054,57.2521493 C78.9641017,63.090208 76.6459976,68.6895714 72.5186979,72.8184433 C68.3913982,76.9473153 62.7929898,79.26748 56.9550587,79.2685282 M75.9206558,218.127392 L37.94995,218.127392 L37.94995,95.9665207 L75.9206558,95.9665207 L75.9206558,218.127392 Z M237.033403,0.0182577091 L18.8895249,0.0182577091 C8.57959469,-0.0980923971 0.124827038,8.16056231 -0.001,18.4706066 L-0.001,237.524091 C0.120519052,247.839103 8.57460631,256.105934 18.8895249,255.9977 L237.033403,255.9977 C247.368728,256.125818 255.855922,247.859464 255.999,237.524091 L255.999,18.4548016 C255.851624,8.12438979 247.363742,-0.133792868 237.033403,0.000790807055"
+                    ></path>
+                  </g></svg></a
+              ><a
+                href="https://github.com/kenhendricks00"
+                class="bg-stone-400 p-2 font-semibold text-white inline-flex items-center space-x-2 rounded-full"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  aria-hidden="true"
+                  role="img"
+                  class="w-5"
+                  preserveAspectRatio="xMidYMid meet"
+                  viewBox="0 0 24 24"
+                >
+                  <g fill="none">
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+                      fill="currentColor"
+                    ></path>
+                  </g></svg
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a
+      class="kufi-button kufi-right"
+      href="https://ko-fi.com/kenhendricks"
+      target="_blank"
+      rel="noreferrer noopener external"
+      title=""
+      ><span class="kufitext"
+        ><img
+          src="https://storage.ko-fi.com/cdn/cup-border.png"
+          alt="support"
+          class="kufiimg"
+        /> Support</span
+      ></a
+    >
+
+    <script>
+      // Add these elements at the beginning of the script
+      const guessesRemainingElement =
+        document.getElementById("guesses-remaining");
+      const guessesUsedElement = document.getElementById("guesses-used");
+
+      const quizQuestions = [
+        {
+          question: 1,
+          answer: "Feel Special",
+          image1: "games/1/1.jpg",
+          image2: "games/1/2.jpg",
+          image3: "games/1/3.jpg",
+          image4: "games/1/4.jpg",
+          image5: "games/1/5.jpg",
+          image6: "games/1/6.jpg",
+          link: "https://www.youtube.com/watch?v=3ymwOvzhwHs",
+          genre: "Pop",
+          release: "2019",
+          label: "JYP",
+          artist: "Twice",
+        },
+        {
+          question: 2,
+          answer: "Dumb Litty",
+          image1: "games/2/1.jpg",
+          image2: "games/2/2.jpg",
+          image3: "games/2/3.jpg",
+          image4: "games/2/4.jpg",
+          image5: "games/2/5.jpg",
+          image6: "games/2/6.jpg",
+          link: "https://www.youtube.com/watch?v=W01_e6hw288",
+          genre: "Pop",
+          release: "2019",
+          label: "DSP Media",
+          artist: "Kard",
+        },
+        {
+          question: 3,
+          answer: "Deja Vu",
+          image1: "games/3/1.jpg",
+          image2: "games/3/2.jpg",
+          image3: "games/3/3.jpg",
+          image4: "games/3/4.jpg",
+          image5: "games/3/5.jpg",
+          image6: "games/3/6.jpg",
+          link: "https://www.youtube.com/watch?v=W761DtH1oRg",
+        },
+        {
+          question: 4,
+          answer: "Fear",
+          image1: "games/4/1.jpg",
+          image2: "games/4/2.jpg",
+          image3: "games/4/3.jpg",
+          image4: "games/4/4.jpg",
+          image5: "games/4/5.jpg",
+          image6: "games/4/6.jpg",
+          link: "https://www.youtube.com/watch?v=ap14O5-G7UA",
+        },
+        {
+          question: 5,
+          answer: "Devil",
+          image1: "games/5/1.jpg",
+          image2: "games/5/2.jpg",
+          image3: "games/5/3.jpg",
+          image4: "games/5/4.jpg",
+          image5: "games/5/5.jpg",
+          image6: "games/5/6.jpg",
+          link: "https://www.youtube.com/watch?v=MY4qnUGwWIU",
+        },
+        {
+          question: 6,
+          answer: "LALALAY",
+          image1: "games/6/1.jpg",
+          image2: "games/6/2.jpg",
+          image3: "games/6/3.jpg",
+          image4: "games/6/4.jpg",
+          image5: "games/6/5.jpg",
+          image6: "games/6/6.jpg",
+          link: "https://www.youtube.com/watch?v=LrggmyDhWBo",
+        },
+        {
+          question: 7,
+          answer: "Flash",
+          image1: "games/7/1.jpg",
+          image2: "games/7/2.jpg",
+          image3: "games/7/3.jpg",
+          image4: "games/7/4.jpg",
+          image5: "games/7/5.jpg",
+          image6: "games/7/6.jpg",
+          link: "https://www.youtube.com/watch?v=LlQEKB2H7z4",
+        },
+        {
+          question: 8,
+          answer: "Umpah Umpah",
+          image1: "games/8/1.jpg",
+          image2: "games/8/2.jpg",
+          image3: "games/8/3.jpg",
+          image4: "games/8/4.jpg",
+          image5: "games/8/5.jpg",
+          image6: "games/8/6.jpg",
+          link: "https://www.youtube.com/watch?v=vHS9E6JFja8",
+        },
+        {
+          question: 9,
+          answer: "Adios",
+          image1: "games/9/1.jpg",
+          image2: "games/9/2.jpg",
+          image3: "games/9/3.jpg",
+          image4: "games/9/4.jpg",
+          image5: "games/9/5.jpg",
+          image6: "games/9/6.jpg",
+          link: "https://www.youtube.com/watch?v=4gX_p1VkgA4",
+        },
+        {
+          question: 10,
+          answer: "D.D.D",
+          image1: "games/10/1.jpg",
+          image2: "games/10/2.jpg",
+          image3: "games/10/3.jpg",
+          image4: "games/10/4.jpg",
+          image5: "games/10/5.jpg",
+          image6: "games/10/6.jpg",
+          link: "",
+        },
+        {
+          question: 11,
+          answer: "Call Anytime",
+          image1: "games/11/1.jpg",
+          image2: "games/11/2.jpg",
+          image3: "games/11/3.jpg",
+          image4: "games/11/4.jpg",
+          image5: "games/11/5.jpg",
+          image6: "games/11/6.jpg",
+          link: "",
+        },
+        {
+          question: 12,
+          answer: "Red",
+          image1: "games/12/1.jpg",
+          image2: "games/12/2.jpg",
+          image3: "games/12/3.jpg",
+          image4: "games/12/4.jpg",
+          image5: "games/12/5.jpg",
+          image6: "games/12/6.jpg",
+          link: "",
+        },
+        {
+          question: 13,
+          answer: "BIM BAM BUM",
+          image1: "games/13/1.jpg",
+          image2: "games/13/2.jpg",
+          image3: "games/13/3.jpg",
+          image4: "games/13/4.jpg",
+          image5: "games/13/5.jpg",
+          image6: "games/13/6.jpg",
+          link: "",
+        },
+        {
+          question: 14,
+          answer: "Spark",
+          image1: "games/14/1.jpg",
+          image2: "games/14/2.jpg",
+          image3: "games/14/3.jpg",
+          image4: "games/14/4.jpg",
+          image5: "games/14/5.jpg",
+          image6: "games/14/6.jpg",
+          link: "",
+        },
+        {
+          question: 15,
+          answer: "Bungee",
+          image1: "games/15/1.jpg",
+          image2: "games/15/2.jpg",
+          image3: "games/15/3.jpg",
+          image4: "games/15/4.jpg",
+          image5: "games/15/5.jpg",
+          image6: "games/15/6.jpg",
+          link: "https://www.youtube.com/watch?v=QTD_yleCK9Y",
+        },
+        {
+          question: 16,
+          answer: "Hit",
+          image1: "games/16/1.jpg",
+          image2: "games/16/2.jpg",
+          image3: "games/16/3.jpg",
+          image4: "games/16/4.jpg",
+          image5: "games/16/5.jpg",
+          image6: "games/16/6.jpg",
+          link: "",
+        },
+        {
+          question: 17,
+          answer: "Icy",
+          image1: "games/17/1.jpg",
+          image2: "games/17/2.jpg",
+          image3: "games/17/3.jpg",
+          image4: "games/17/4.jpg",
+          image5: "games/17/5.jpg",
+          image6: "games/17/6.jpg",
+          link: "",
+        },
+        {
+          question: 18,
+          answer: "Boom",
+          image1: "games/18/1.jpg",
+          image2: "games/18/2.jpg",
+          image3: "games/18/3.jpg",
+          image4: "games/18/4.jpg",
+          image5: "games/18/5.jpg",
+          image6: "games/18/6.jpg",
+          link: "",
+        },
+        //Placeholder past this point vv
+        {
+          question: 19,
+          answer: "Power Up",
+          image1: "games/19/1.jpg",
+          image2: "games/19/2.jpg",
+          image3: "games/19/3.jpg",
+          image4: "games/19/4.jpg",
+          image5: "games/19/5.jpg",
+          image6: "games/19/6.jpg",
+          link: "",
+        },
+        {
+          question: 20,
+          answer: "Fancy",
+          image1: "games/20/1.jpg",
+          image2: "games/20/2.jpg",
+          image3: "games/20/3.jpg",
+          image4: "games/20/4.jpg",
+          image5: "games/20/5.jpg",
+          image6: "games/20/6.jpg",
+          link: "",
+        },
+        {
+          question: 21,
+          answer: "Psycho",
+          image1: "games/21/1.jpg",
+          image2: "games/21/2.jpg",
+          image3: "games/21/3.jpg",
+          image4: "games/21/4.jpg",
+          image5: "games/21/5.jpg",
+          image6: "games/21/6.jpg",
+          link: "",
+        },
+        {
+          question: 22,
+          answer: "Snapping",
+          image1: "games/22/1.jpg",
+          image2: "games/22/2.jpg",
+          image3: "games/22/3.jpg",
+          image4: "games/22/4.jpg",
+          image5: "games/22/5.jpg",
+          image6: "games/22/6.jpg",
+          link: "",
+        },
+        {
+          question: 23,
+          answer: "Gashina",
+          image1: "games/23/1.jpg",
+          image2: "games/23/2.jpg",
+          image3: "games/23/3.jpg",
+          image4: "games/23/4.jpg",
+          image5: "games/23/5.jpg",
+          image6: "games/23/6.jpg",
+          link: "",
+        },
+        // Add more questions here...
+        // Questions 24 to 50
+        {
+          question: 24,
+          answer: "Nonstop",
+          image1: "games/24/1.jpg",
+          image2: "games/24/2.jpg",
+          image3: "games/24/3.jpg",
+          image4: "games/24/4.jpg",
+          image5: "games/24/5.jpg",
+          image6: "games/24/6.jpg",
+          link: "",
+        },
+        {
+          question: 25,
+          answer: "Fiesta",
+          image1: "games/25/1.jpg",
+          image2: "games/25/2.jpg",
+          image3: "games/25/3.jpg",
+          image4: "games/25/4.jpg",
+          image5: "games/25/5.jpg",
+          image6: "games/25/6.jpg",
+          link: "",
+        },
+        {
+          question: 26,
+          answer: "La Vie en Rose",
+          image1: "games/26/1.jpg",
+          image2: "games/26/2.jpg",
+          image3: "games/26/3.jpg",
+          image4: "games/26/4.jpg",
+          image5: "games/26/5.jpg",
+          image6: "games/26/6.jpg",
+          link: "",
+        },
+        {
+          question: 27,
+          answer: "Boom Boom",
+          image1: "games/27/1.jpg",
+          image2: "games/27/2.jpg",
+          image3: "games/27/3.jpg",
+          image4: "games/27/4.jpg",
+          image5: "games/27/5.jpg",
+          image6: "games/27/6.jpg",
+          link: "",
+        },
+        {
+          question: 28,
+          answer: "Kill This Love",
+          image1: "games/28/1.jpg",
+          image2: "games/28/2.jpg",
+          image3: "games/28/3.jpg",
+          image4: "games/28/4.jpg",
+          image5: "games/28/5.jpg",
+          image6: "games/28/6.jpg",
+          link: "",
+        },
+        // Add more questions here...
+        // Questions 29 to 50
+        {
+          question: 29,
+          answer: "Bon Bon Chocolat",
+          image1: "games/29/1.jpg",
+          image2: "games/29/2.jpg",
+          image3: "games/29/3.jpg",
+          image4: "games/29/4.jpg",
+          image5: "games/29/5.jpg",
+          image6: "games/29/6.jpg",
+          link: "",
+        },
+        {
+          question: 30,
+          answer: "Lovesick Girls",
+          image1: "games/30/1.jpg",
+          image2: "games/30/2.jpg",
+          image3: "games/30/3.jpg",
+          image4: "games/30/4.jpg",
+          image5: "games/30/5.jpg",
+          image6: "games/30/6.jpg",
+          link: "",
+        },
+        {
+          question: 31,
+          answer: "Dalla Dalla",
+          image1: "games/31/1.jpg",
+          image2: "games/31/2.jpg",
+          image3: "games/31/3.jpg",
+          image4: "games/31/4.jpg",
+          image5: "games/31/5.jpg",
+          image6: "games/31/6.jpg",
+          link: "",
+        },
+        {
+          question: 32,
+          answer: "Euphoria",
+          image1: "games/32/1.jpg",
+          image2: "games/32/2.jpg",
+          image3: "games/32/3.jpg",
+          image4: "games/32/4.jpg",
+          image5: "games/32/5.jpg",
+          image6: "games/32/6.jpg",
+          link: "",
+        },
+        {
+          question: 33,
+          answer: "Oh My God",
+          image1: "games/33/1.jpg",
+          image2: "games/33/2.jpg",
+          image3: "games/33/3.jpg",
+          image4: "games/33/4.jpg",
+          image5: "games/33/5.jpg",
+          image6: "games/33/6.jpg",
+          link: "",
+        },
+        // Add more questions here...
+        // Questions 34 to 50
+        {
+          question: 34,
+          answer: "Love Scenario",
+          image1: "games/34/1.jpg",
+          image2: "games/34/2.jpg",
+          image3: "games/34/3.jpg",
+          image4: "games/34/4.jpg",
+          image5: "games/34/5.jpg",
+          image6: "games/34/6.jpg",
+          link: "",
+        },
+        {
+          question: 35,
+          answer: "Zimzalabim",
+          image1: "games/35/1.jpg",
+          image2: "games/35/2.jpg",
+          image3: "games/35/3.jpg",
+          image4: "games/35/4.jpg",
+          image5: "games/35/5.jpg",
+          image6: "games/35/6.jpg",
+          link: "",
+        },
+        // ... Continue up to 50 questions
+        {
+          question: 49,
+          answer: "Vroom Vroom",
+          image1: "games/49/1.jpg",
+          image2: "games/49/2.jpg",
+          image3: "games/49/3.jpg",
+          image4: "games/49/4.jpg",
+          image5: "games/49/5.jpg",
+          image6: "games/49/6.jpg",
+          link: "",
+        },
+        {
+          question: 50,
+          answer: "Dance the Night Away",
+          image1: "games/50/1.jpg",
+          image2: "games/50/2.jpg",
+          image3: "games/50/3.jpg",
+          image4: "games/50/4.jpg",
+          image5: "games/50/5.jpg",
+          image6: "games/50/6.jpg",
+          link: "",
+        },
+      ];
+
+      let currentQuestion = 1;
+      let guessesRemaining = 6;
+      // Keep track of the guesses used
+      let guessesUsed = 0;
+      let currentImageIndex = 0;
+      let timerId;
+
+      window.onload = function () {
+        const cookieData = getCookieData();
+        if (cookieData) {
+          guessesRemaining = cookieData.guessesRemaining;
+          guessesUsed = cookieData.guessesUsed;
+          currentQuestion = cookieData.currentQuestion;
+          currentImageIndex = cookieData.currentImageIndex;
+        }
+
+        displayQuestion();
+        startTimer(); // Call the startTimer function here to begin the timer
+        updateImage();
+      };
+
+      let currentImageNumber = 1; // Variable to keep track of the current image number
+
+      function startTimer() {
+        // Set the timer to 24 hours (24 * 60 * 60 * 1000 milliseconds)
+        const timerDuration = 24 * 60 * 60 * 1000;
+
+        // Start the timer
+        setTimeout(() => {
+          // Move to the next question when the timer expires
+          displayNextQuestion();
+        }, timerDuration);
+      }
+
+      function displayQuestion() {
+        // Check if currentQuestion is within valid range
+        if (currentQuestion < 0 || currentQuestion >= quizQuestions.length) {
+          currentQuestion = 0;
+        }
+
+        const questionTextElement = document.getElementById("question-text");
+        const answerInputElement = document.getElementById("answer-input");
+
+        // Set the image source for each guess button
+        const imageContainer = document.getElementById("image-container");
+        const answerImageElement = document.getElementById("answer-image");
+
+        currentImageNumber = 1; // Reset the current image number to 1 for the new question
+
+        // Reset the guesses used and image index for each new question
+        guessesUsed = 0;
+        // Set the default image source for the first button
+        answerImageElement.src = quizQuestions[currentQuestion]["image1"];
+
+        // Update the image source for each button based on the question
+        for (let i = 1; i <= 6; i++) {
+          const button = document.getElementById("button-" + i);
+          if (quizQuestions[currentQuestion]["image" + i]) {
+            if (i <= guessesUsed) {
+              answerImageElement.src =
+                quizQuestions[currentQuestion]["image" + i];
+            }
+
+            if (i === 1) {
+              button.disabled = false; // Enable the first button
+              button.classList.remove("opacity-50", "cursor-not-allowed");
+            } else {
+              button.disabled = true; // Disable other buttons
+              button.classList.add("opacity-50", "cursor-not-allowed");
+            }
+
+            button.addEventListener("click", function () {
+              answerImageElement.src =
+                quizQuestions[currentQuestion]["image" + i];
+            });
+          }
+        }
+        const guessesRemainingElement =
+          document.getElementById("guesses-remaining");
+        const guessesUsedElement = document.getElementById("guesses-used");
+
+        questionTextElement.textContent =
+          quizQuestions[currentQuestion].question;
+        answerInputElement.value = "";
+        answerImageElement.src = quizQuestions[currentQuestion].image1; // Set the image source
+        guessesRemainingElement.textContent = guessesRemaining;
+        guessesUsedElement.textContent = guessesUsed;
+        updateTimerDisplay(); // Call the updateTimerDisplay function here to update the timer display
+
+        const submitAnswerButton = document.getElementById(
+          "submit-answer-button"
+        );
+
+        answerInputElement.addEventListener("input", function () {
+          if (answerInputElement.value.trim() === "") {
+            submitAnswerButton.disabled = true;
+          } else {
+            submitAnswerButton.disabled = false;
+          }
+        });
+
+        updateImage();
+      }
+
+      function checkAnswer() {
+        // Get the user's answer from the text field
+        const userAnswer = answerInputElement.value.toLowerCase();
+        if (userAnswer === "") {
+          return;
+        }
+        const correctAnswer =
+          quizQuestions[currentQuestion].answer.toLowerCase();
+        const answerImageElement = document.getElementById("answer-image");
+        const guessesRemainingElement =
+          document.getElementById("guesses-remaining");
+
+        if (userAnswer === correctAnswer) {
+          displayWinMessage();
+
+          // Call the updateImage() function after handling the guess
+          updateImage(); // Call the updateImage function to display the next image
+          currentImageNumber = guessesUsed + 1; // Set currentImageNumber to the latest image number
+
+          guessesUsed++;
+
+          const buttons = document.querySelectorAll(".btn-guess");
+
+          // Enable all guess buttons for new guess
+          buttons.forEach((button) => {
+            button.disabled = false;
+            button.classList.remove("opacity-50", "cursor-not-allowed");
+          });
+          // Add class for correct guess
+          const correctButton = document.getElementById(
+            "button-" + guessesUsed
+          );
+          correctButton.classList.remove("bg-blue-500");
+          correctButton.classList.add("bg-green-500");
+          // Show the border around the wrong answers list
+          const attemptsList = document.getElementById("attempts-list");
+          attemptsList.classList.add("right-guess-border");
+
+          // Create the ✅ emoji element
+          const rightGuessEmoji = document.createElement("span");
+          rightGuessEmoji.textContent = "✅";
+          rightGuessEmoji.classList.add("emoji", "mr-2"); // Add the class "emoji" and "mr-2" for spacing
+
+          // Add a new wrong guess item container with the class "wrong-guess-item"
+          const rightGuessContainer = document.createElement("div");
+          rightGuessContainer.classList.add(
+            "right-guess-item",
+            "border",
+            "border-green-500",
+            "text-green-500",
+            "font-bold",
+            "my-2",
+            "p-2",
+            "rounded-lg"
+          );
+
+          // Append the ❌ emoji element before the wrong guess text
+          rightGuessContainer.appendChild(rightGuessEmoji);
+
+          // Append the wrong guess text to the container
+          const rightGuessText = document.createTextNode(
+            toTitleCase(correctAnswer)
+          );
+          rightGuessContainer.appendChild(rightGuessText);
+
+          // Append the container to the attempts list
+          attemptsList.appendChild(rightGuessContainer);
+          clearTimeout(timerId);
+          // Call the updateImage() function after handling the guess
+          updateImage(); // Call the updateImage function to display the next image
+          currentImageNumber = guessesUsed + 1; // Set currentImageNumber to the latest image number
+          // enable if you want to save amount of guesses used next turn saveCookieData();
+        } else {
+          if (guessesRemaining <= 1) {
+            displayGameOverMessage();
+          }
+
+          // Call the updateImage() function after handling the guess
+          updateImage(); // Call the updateImage function to display the next image
+          currentImageNumber = guessesUsed + 1; // Set currentImageNumber to the latest image number
+
+          // Hide "Guesses Remaining:" text
+          const guessesTextElement = document.getElementById("guesses-text");
+          guessesTextElement.style.display = "none";
+          // Clear the text field after submission
+          answerInputElement.value = "";
+          // Add class for wrong guess
+          const wrongButton = document.getElementById(
+            "button-" + (guessesUsed + 1)
+          );
+          wrongButton.classList.remove("bg-blue-500");
+          wrongButton.classList.add("bg-red-500");
+          currentImageNumber++; // Increment the current image number for the next guess
+          // Show the border around the wrong answers list
+          const attemptsList = document.getElementById("attempts-list");
+          attemptsList.classList.add("wrong-guess-border");
+
+          // Create the ❌ emoji element
+          const wrongGuessEmoji = document.createElement("span");
+          wrongGuessEmoji.textContent = "❌";
+          wrongGuessEmoji.classList.add("emoji", "mr-2"); // Add the class "emoji" and "mr-2" for spacing
+
+          // Add a new wrong guess item container with the class "wrong-guess-item"
+          const wrongGuessContainer = document.createElement("div");
+          wrongGuessContainer.classList.add(
+            "wrong-guess-item",
+            "border",
+            "border-red-500",
+            "text-red-500",
+            "font-bold",
+            "my-2",
+            "p-2",
+            "rounded-lg",
+            "truncate"
+          );
+
+          // Append the ❌ emoji element before the wrong guess text
+          wrongGuessContainer.appendChild(wrongGuessEmoji);
+
+          // Append the wrong guess text to the container
+          const wrongGuessText = document.createTextNode(
+            toTitleCase(userAnswer)
+          );
+          wrongGuessContainer.appendChild(wrongGuessText);
+
+          // Append the container to the attempts list
+          attemptsList.appendChild(wrongGuessContainer);
+
+          const buttons = document.querySelectorAll(".btn-guess");
+          guessesUsed++;
+          updateImage(); // Call the updateImage function to display the next image
+
+          // Disable unused guess buttons
+          buttons.forEach((button, index) => {
+            if (index >= guessesUsed) {
+              button.disabled = true;
+              button.classList.add("opacity-50", "cursor-not-allowed");
+            } else {
+              // Remove the classes "opacity-50" & "cursor-not-allowed" from the used guess button
+              button.disabled = false;
+              button.classList.remove("opacity-50", "cursor-not-allowed");
+            }
+          });
+
+          guessesRemaining--;
+          // Update the "guesses-remaining" element to display "Last guess!" when there is only one guess remaining
+          const guessesRemainingElement =
+            document.getElementById("guesses-remaining");
+          if (guessesRemaining === 1) {
+            guessesRemainingElement.textContent = "Last guess!";
+          } else {
+            guessesRemainingElement.textContent = `${guessesRemaining} guesses remaining!`;
+          }
+
+          guessesUsedElement.textContent = guessesUsed; // Update the guesses used count display
+
+          if (guessesRemaining <= 1) {
+            displayGameOverMessage();
+            const buttons = document.querySelectorAll(".btn-guess");
+
+            // Enable all guess buttons for new guess
+            buttons.forEach((button) => {
+              button.disabled = false;
+              button.classList.remove("opacity-50", "cursor-not-allowed");
+            });
+            clearTimeout(timerId);
+            saveCookieData();
+          } else {
+            handleGuess(); // Call the handleGuess function to update guess buttons
+          }
+        }
+
+        // Clear the text field after submission
+        answerInputElement.value = "";
+        submitAnswerButton.disabled = true; // Disable the button again after submission
+      }
+
+      function displayNextQuestion() {
+        currentQuestionIndex =
+          (currentQuestionIndex + 1) % quizQuestions.length;
+        displayQuestion();
+      }
+
+      function handleGuess() {
+        const buttons = document.querySelectorAll(".btn-guess");
+
+        currentImageNumber = 0;
+
+        currentImageNumber++; // Increment the current image number for the next guess
+
+        // Enable all guess buttons for new guess
+        buttons.forEach((button) => {
+          button.disabled = false;
+        });
+
+        // Disable unused guess buttons
+        buttons.forEach((button, index) => {
+          if (index >= guessesUsed) {
+            button.disabled = true;
+            button.classList.add("opacity-50", "cursor-not-allowed");
+          } else {
+            currentImageNumber++; // Increment the current image number for the next guess
+            // Remove the classes "opacity-50" & "cursor-not-allowed" from the used guess button
+            button.classList.remove("opacity-50", "cursor-not-allowed");
+          }
+        });
+
+        updateImage();
+
+        // Update the "guesses-remaining" element to display "Last guess!" when there is only one guess remaining
+        const guessesRemainingElement =
+          document.getElementById("guesses-remaining");
+        if (guessesRemaining === 1) {
+          guessesRemainingElement.textContent = "Last guess!";
+        } else {
+          guessesRemainingElement.textContent = `${guessesRemaining} guesses remaining!`;
+        }
+      }
+
+      function updateImage() {
+        const answerImageElement = document.getElementById("answer-image");
+        const hintElement = document.getElementById("guess-hint");
+        const currentQuestionData = quizQuestions[currentQuestion];
+
+        // Ensure currentImageNumber does not exceed 6
+        if (currentImageNumber > 6) {
+          currentImageNumber = 6;
+        }
+
+        if (currentQuestionData["image" + currentImageNumber]) {
+          answerImageElement.src =
+            currentQuestionData["image" + currentImageNumber];
+        }
+
+        // Show/hide the hint based on the currentImageNumber
+        if (currentImageNumber === 3) {
+          hintElement.textContent = `Genre: ${currentQuestionData.genre}`;
+          hintElement.style.display = "block";
+        } else if (currentImageNumber === 4) {
+          hintElement.textContent = `Release: ${currentQuestionData.release}`;
+          hintElement.style.display = "block";
+        } else if (currentImageNumber === 5) {
+          hintElement.textContent = `Label: ${currentQuestionData.label}`;
+          hintElement.style.display = "block";
+        } else if (currentImageNumber === 6) {
+          hintElement.textContent = `Artist: ${currentQuestionData.artist}`;
+          hintElement.style.display = "block";
+        } else {
+          hintElement.style.display = "none";
+        }
+
+        // Remove the "font-bold" class from all guess buttons
+        const guessButtons = document.querySelectorAll(".guess-button");
+        guessButtons.forEach((button) => {
+          button.classList.remove("font-bold");
+        });
+
+        // Add the "font-bold" class to the corresponding guess button
+        const currentGuessButton = document.getElementById(
+          `button-${currentImageNumber}`
+        );
+        currentGuessButton.classList.add("font-bold");
+      }
+
+      function updateTimerDisplay() {
+        const timerElement = document.getElementById("timer");
+        const timeLeft = getTimeLeft();
+
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          timerElement.textContent = "00:00:00";
+          alert("New anime is now available!");
+          nextQuestion();
+        } else {
+          const hours = Math.floor(timeLeft / 3600)
+            .toString()
+            .padStart(2, "0");
+          const minutes = Math.floor((timeLeft % 3600) / 60)
+            .toString()
+            .padStart(2, "0");
+          const seconds = (timeLeft % 60).toString().padStart(2, "0");
+          timerElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
+        }
+      }
+
+      // Call the updateTimerDisplay function every second using setInterval
+      setInterval(updateTimerDisplay, 1000);
+
+      function getTimeLeft() {
+        const now = new Date();
+        const nextQuestionDate = new Date(now);
+        nextQuestionDate.setHours(0, 0, 0, 0); // Set to midnight
+        nextQuestionDate.setDate(nextQuestionDate.getDate() + 1); // Add one day
+        const timeLeft = Math.floor((nextQuestionDate - now) / 1000);
+        return timeLeft;
+      }
+
+      function saveCookieData() {
+        document.cookie = `guessesRemaining=${guessesRemaining}; expires=Sun, 1 Jan 2025 00:00:00 UTC;`;
+        document.cookie = `guessesUsed=${guessesUsed}; expires=Sun, 1 Jan 2025 00:00:00 UTC;`;
+        document.cookie = `currentQuestion=${currentQuestion}; expires=Sun, 1 Jan 2025 00:00:00 UTC;`;
+        document.cookie = `currentImageIndex=${currentImageIndex}; expires=Sun, 1 Jan 2025 00:00:00 UTC;`;
+      }
+
+      function getCookieData() {
+        const cookies = document.cookie.split("; ").reduce((obj, cookie) => {
+          const [key, value] = cookie.split("=");
+          obj[key] = value;
+          return obj;
+        }, {});
+
+        if (
+          cookies.hasOwnProperty("guessesRemaining") &&
+          cookies.hasOwnProperty("guessesUsed") &&
+          cookies.hasOwnProperty("currentQuestion") &&
+          cookies.hasOwnProperty("currentImageIndex")
+        ) {
+          return {
+            guessesRemaining: parseInt(cookies.guessesRemaining),
+            guessesUsed: parseInt(cookies.guessesUsed),
+            currentQuestion: parseInt(cookies.currentQuestion),
+            currentImageIndex: parseInt(cookies.currentImageIndex),
+          };
+        }
+
+        return null;
+      }
+
+      function nextQuestion() {
+        currentQuestion = (currentQuestion + 1) % quizQuestions.length;
+        displayQuestion();
+      }
+
+      // Autocomplete functionality
+      const answerInputElement = document.getElementById("answer-input");
+      const suggestionsContainer = document.getElementById(
+        "autocomplete-suggestions"
+      );
+
+      answerInputElement.addEventListener("input", function () {
+        const userInput = answerInputElement.value.toLowerCase();
+        const suggestions = getAutocompleteSuggestions(userInput);
+
+        if (userInput === "") {
+          suggestionsContainer.innerHTML = "";
+        } else {
+          suggestionsContainer.innerHTML = "";
+          suggestions.forEach((suggestion) => {
+            const suggestionElement = document.createElement("div");
+            suggestionElement.textContent = toTitleCase(suggestion);
+            // Inside the 'forEach' loop that creates the suggestion elements
+            suggestionElement.classList.add(
+              "autocomplete-item",
+              "px-2",
+              "py-1",
+              "cursor-pointer",
+              "rounded" // Add the 'rounded' class for rounded borders
+            );
+            suggestionElement.addEventListener("click", function () {
+              answerInputElement.value = suggestion;
+              suggestionsContainer.innerHTML = "";
+            });
+            suggestionsContainer.appendChild(suggestionElement);
+          });
+        }
+      });
+
+      function getAutocompleteSuggestions(userInput) {
+        const existingAnswers = quizQuestions.map(
+          (question) => question.answer
+        );
+        return existingAnswers.filter((answer) =>
+          answer.toLowerCase().startsWith(userInput)
+        );
+      }
+
+      function toTitleCase(str) {
+        return str.replace(/\b\w+/g, function (txt) {
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+      }
+
+      function skipGuess() {
+        // Hide "Guesses Remaining:" text
+        const guessesTextElement = document.getElementById("guesses-text");
+        guessesTextElement.style.display = "none";
+        // Clear the text field after skipping
+        answerInputElement.value = "";
+        // Add class for skipped guess
+        const skipButton = document.getElementById(
+          "button-" + (guessesUsed + 1)
+        );
+        skipButton.classList.remove("bg-blue-500");
+        skipButton.classList.add("bg-yellow-500");
+        // Call the updateImage() function after handling the guess
+        updateImage(); // Call the updateImage function to display the next image
+        currentImageNumber = guessesUsed + 2; // Set currentImageNumber to the latest image number
+
+        // Check if there are guesses remaining
+        if (guessesRemaining <= 1) {
+          // If no guesses remaining, display the message with the correct answer
+          displayGameOverMessage();
+          const buttons = document.querySelectorAll(".btn-guess");
+
+          // Enable all guess buttons for new guess
+          buttons.forEach((button) => {
+            button.disabled = false;
+            button.classList.remove("opacity-50", "cursor-not-allowed");
+          });
+        }
+
+        // Show the border around the wrong answers list
+        const attemptsList = document.getElementById("attempts-list");
+        attemptsList.classList.add("wrong-guess-border");
+
+        // Create the ❌ emoji element
+        const wrongGuessEmoji = document.createElement("span");
+        wrongGuessEmoji.textContent = "⏭️";
+        wrongGuessEmoji.classList.add("emoji", "mr-2"); // Add the class "emoji" and "mr-2" for spacing
+
+        // Add a new wrong guess item container with the class "wrong-guess-item"
+        const wrongGuessContainer = document.createElement("div");
+        wrongGuessContainer.classList.add(
+          "wrong-guess-item",
+          "border",
+          "border-yellow-500",
+          "text-yellow-500",
+          "font-bold",
+          "my-2",
+          "p-2",
+          "rounded-lg",
+          "truncate"
+        );
+
+        // Append the ❌ emoji element before the wrong guess text
+        wrongGuessContainer.appendChild(wrongGuessEmoji);
+
+        // Append the wrong guess text to the container
+        const wrongGuessText = document.createTextNode("Skipped");
+        wrongGuessContainer.appendChild(wrongGuessText);
+
+        // Append the container to the attempts list
+        attemptsList.appendChild(wrongGuessContainer);
+
+        const buttons = document.querySelectorAll(".btn-guess");
+        guessesUsed++;
+        updateImage(); // Call the updateImage function to display the next image
+
+        // Disable unused guess buttons
+        buttons.forEach((button, index) => {
+          if (index >= guessesUsed) {
+            button.disabled = true;
+            button.classList.add("opacity-50", "cursor-not-allowed");
+          } else {
+            // Remove the classes "opacity-50" & "cursor-not-allowed" from the used guess button
+            button.disabled = false;
+            button.classList.remove("opacity-50", "cursor-not-allowed");
+          }
+        });
+
+        guessesRemaining--;
+        // Update the "guesses-remaining" element to display "Last guess!" when there is only one guess remaining
+        const guessesRemainingElement =
+          document.getElementById("guesses-remaining");
+        if (guessesRemaining === 1) {
+          guessesRemainingElement.textContent = "Last guess!";
+        } else {
+          guessesRemainingElement.textContent = `${guessesRemaining} guesses remaining!`;
+        }
+
+        guessesUsedElement.textContent = guessesUsed; // Update the guesses used count display
+
+        if (guessesRemaining <= 1) {
+          // If no guesses remaining, display the message with the correct answer
+          displayGameOverMessage();
+          const buttons = document.querySelectorAll(".btn-guess");
+
+          // Enable all guess buttons for new guess
+          buttons.forEach((button) => {
+            button.disabled = false;
+            button.classList.remove("opacity-50", "cursor-not-allowed");
+          });
+          clearTimeout(timerId);
+          saveCookieData();
+        } else {
+          handleGuess(); // Call the handleGuess function to update guess buttons
+        }
+      }
+
+      function displayGameOverMessage() {
+        const answerInputElement = document.getElementById("answer-input");
+        const submitAnswerButton = document.getElementById(
+          "submit-answer-button"
+        );
+        const skipButton = document.getElementById("skip-button");
+        const autocompleteSuggestions = document.getElementById(
+          "autocomplete-suggestions"
+        );
+        const guessesRemaining = document.getElementById("guesses");
+
+        const correctAnswer = quizQuestions[currentQuestion].answer;
+        const link = quizQuestions[currentQuestion].link;
+
+        answerInputElement.style.display = "none";
+        submitAnswerButton.style.display = "none";
+        skipButton.style.display = "none";
+        autocompleteSuggestions.style.display = "none";
+        guessesRemaining.style.display = "none";
+
+        const gameOverMessage = document.createElement("p");
+        gameOverMessage.classList.add(
+          "text-xl",
+          "font-bold",
+          "mt-4",
+          "text-red-400"
+        );
+
+        // Create the "Oh no! Better luck next time." message as an h2 tag with a red color
+        const messageHeader = document.createElement("h2");
+        messageHeader.classList.add(
+          "text-2xl",
+          "text-red-500",
+          "font-bold",
+          "mb-2",
+          "text-center"
+        );
+        messageHeader.textContent = "Oh no! Better luck next time.";
+
+        // Create the container for "The answer was:" and the correct answer
+        const answerContainer = document.createElement("div");
+        answerContainer.classList.add("gap-1", "items-center", "text-center");
+
+        // Create the "The answer was: " text as a white p tag
+        const answerText = document.createElement("p");
+        answerText.classList.add("text-white");
+        answerText.textContent = "The answer was: ";
+
+        // Add a space after "The answer was:" text
+        const spaceText = document.createTextNode(" ");
+
+        // Create the correct answer as a green p tag
+        const correctAnswerText = document.createElement("p");
+
+        // Create the correct answer as a green anchor tag (hyperlink)
+        const correctAnswerLink = document.createElement("a");
+        correctAnswerLink.classList.add("text-green-500");
+        correctAnswerLink.textContent = correctAnswer;
+        correctAnswerLink.href = link; // Use the extracted link as the href attribute
+
+        // Append the elements to the answer container
+        answerContainer.appendChild(answerText);
+        answerContainer.appendChild(spaceText); // Add the space
+        correctAnswerLink.appendChild(correctAnswerText); // Append the text to the link
+        answerContainer.appendChild(correctAnswerLink);
+
+        // Append all the elements to the gameOverMessage
+        gameOverMessage.appendChild(messageHeader);
+        gameOverMessage.appendChild(answerContainer);
+
+        const questionContainer = document.getElementById("game-over");
+        questionContainer.appendChild(gameOverMessage);
+      }
+
+      function displayWinMessage() {
+        const answerInputElement = document.getElementById("answer-input");
+        const submitAnswerButton = document.getElementById(
+          "submit-answer-button"
+        );
+        const skipButton = document.getElementById("skip-button");
+        const autocompleteSuggestions = document.getElementById(
+          "autocomplete-suggestions"
+        );
+        const guessesRemaining = document.getElementById("guesses");
+
+        const correctAnswer = quizQuestions[currentQuestion].answer;
+        const link = quizQuestions[currentQuestion].link;
+
+        answerInputElement.style.display = "none";
+        submitAnswerButton.style.display = "none";
+        skipButton.style.display = "none";
+        autocompleteSuggestions.style.display = "none";
+        guessesRemaining.style.display = "none";
+
+        const gameOverMessage = document.createElement("p");
+        gameOverMessage.classList.add(
+          "text-xl",
+          "font-bold",
+          "mt-4",
+          "text-red-400"
+        );
+
+        // Create the "Oh no! Better luck next time." message as an h2 tag with a red color
+        const messageHeader = document.createElement("h2");
+        messageHeader.classList.add(
+          "text-2xl",
+          "text-green-500",
+          "font-bold",
+          "mb-2",
+          "text-center"
+        );
+        messageHeader.textContent = "You nailed it!";
+
+        // Create the container for "The answer was:" and the correct answer
+        const answerContainer = document.createElement("div");
+        answerContainer.classList.add("gap-1", "items-center", "text-center");
+
+        // Create the "The answer was: " text as a white p tag
+        const answerText = document.createElement("p");
+        answerText.classList.add("text-white");
+        answerText.textContent = "The answer was: ";
+
+        // Add a space after "The answer was:" text
+        const spaceText = document.createTextNode(" ");
+
+        // Create the correct answer as a green p tag
+        const correctAnswerText = document.createElement("p");
+
+        // Create the correct answer as a green anchor tag (hyperlink)
+        const correctAnswerLink = document.createElement("a");
+        correctAnswerLink.classList.add("text-green-500");
+        correctAnswerLink.textContent = correctAnswer;
+        correctAnswerLink.href = link; // Use the extracted link as the href attribute
+
+        // Append the elements to the answer container
+        answerContainer.appendChild(answerText);
+        answerContainer.appendChild(spaceText); // Add the space
+        correctAnswerLink.appendChild(correctAnswerText); // Append the text to the link
+        answerContainer.appendChild(correctAnswerLink);
+
+        // Append all the elements to the gameOverMessage
+        gameOverMessage.appendChild(messageHeader);
+        gameOverMessage.appendChild(answerContainer);
+
+        const questionContainer = document.getElementById("game-over");
+        questionContainer.appendChild(gameOverMessage);
+      }
+
+      // Move this code outside the displayQuestion function to ensure it runs only once
+      const guessButtons = document.querySelectorAll(".guess-button");
+      guessButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          // Remove "font-bold" class from all guess buttons
+          guessButtons.forEach((btn) => {
+            btn.classList.remove("font-bold");
+          });
+
+          // Add "font-bold" class to the clicked button
+          this.classList.add("font-bold");
+        });
+      });
+
+      let selectedSuggestionIndex = -1; // Store the index of the selected suggestion
+
+      answerInputElement.addEventListener("input", function () {
+        const userInput = answerInputElement.value.toLowerCase();
+        const suggestions = getAutocompleteSuggestions(userInput);
+
+        if (userInput === "") {
+          suggestionsContainer.innerHTML = "";
+          selectedSuggestionIndex = -1; // Reset the selected suggestion index when input is empty
+        } else {
+          selectedSuggestionIndex = 0; // Set the selected suggestion index to 0 when input is not empty
+          suggestionsContainer.innerHTML = "";
+          suggestions.forEach((suggestion, index) => {
+            const suggestionElement = document.createElement("div");
+            suggestionElement.textContent = toTitleCase(suggestion);
+            suggestionElement.classList.add(
+              "autocomplete-item",
+              "px-2",
+              "py-1",
+              "cursor-pointer",
+              "rounded"
+            );
+
+            if (index === selectedSuggestionIndex) {
+              suggestionElement.classList.add("selected-suggestion");
+            } else {
+              suggestionElement.classList.remove("selected-suggestion");
+            }
+
+            suggestionElement.addEventListener("click", function () {
+              answerInputElement.value = suggestion;
+              suggestionsContainer.innerHTML = "";
+              selectedSuggestionIndex = -1; // Reset the selected suggestion index after selecting a suggestion
+            });
+
+            suggestionsContainer.appendChild(suggestionElement);
+          });
+        }
+      });
+
+      // Handle keyboard events
+      answerInputElement.addEventListener("keydown", function (event) {
+        const suggestions = getAutocompleteSuggestions(
+          answerInputElement.value.toLowerCase()
+        );
+
+        if (suggestions.length === 0) {
+          return;
+        }
+
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          if (selectedSuggestionIndex > 0) {
+            selectedSuggestionIndex--;
+          }
+          updateSelectedSuggestionStyle();
+        } else if (event.key === "ArrowDown") {
+          event.preventDefault();
+          if (selectedSuggestionIndex < suggestions.length - 1) {
+            selectedSuggestionIndex++;
+          }
+          updateSelectedSuggestionStyle();
+        } else if (event.key === "Enter") {
+          event.preventDefault();
+          if (selectedSuggestionIndex >= 0) {
+            answerInputElement.value = suggestions[selectedSuggestionIndex];
+            suggestionsContainer.innerHTML = "";
+            selectedSuggestionIndex = -1; // Reset the selected suggestion index after pressing Enter
+          }
+        }
+      });
+
+      function updateSelectedSuggestionStyle() {
+        const suggestionElements =
+          document.querySelectorAll(".autocomplete-item");
+        suggestionElements.forEach((suggestionElement, index) => {
+          if (index === selectedSuggestionIndex) {
+            suggestionElement.classList.add("selected-suggestion");
+            // Scroll the suggestion list to ensure the selected suggestion is visible
+            const container = document.getElementById(
+              "autocomplete-suggestions"
+            );
+            const scrollHeight =
+              suggestionElement.offsetTop - container.offsetTop;
+            container.scrollTop = scrollHeight;
+          } else {
+            suggestionElement.classList.remove("selected-suggestion");
+          }
+        });
+      }
+
+      // Autocomplete functionality
+      const MIN_CHARS_FOR_AUTOCOMPLETE = 3; // Minimum characters needed for autocomplete suggestions
+
+      answerInputElement.addEventListener("input", function () {
+        const userInput = answerInputElement.value.toLowerCase();
+
+        if (userInput.length < MIN_CHARS_FOR_AUTOCOMPLETE) {
+          // Clear suggestions and return early if input length is less than 3
+          suggestionsContainer.innerHTML = "";
+          return;
+        }
+
+        const suggestions = getAutocompleteSuggestions(userInput);
+
+        if (suggestions.length === 0) {
+          suggestionsContainer.innerHTML = "";
+          selectedSuggestionIndex = -1; // Reset the selected suggestion index when no suggestions are available
+        } else {
+          selectedSuggestionIndex = 0; // Set the selected suggestion index to 0 when suggestions are available
+          suggestionsContainer.innerHTML = "";
+          suggestions.forEach((suggestion, index) => {
+            const suggestionElement = document.createElement("div");
+            suggestionElement.textContent = toTitleCase(suggestion);
+            suggestionElement.classList.add(
+              "autocomplete-item",
+              "px-2",
+              "py-1",
+              "cursor-pointer",
+              "rounded"
+            );
+
+            if (index === selectedSuggestionIndex) {
+              suggestionElement.classList.add("selected-suggestion");
+            } else {
+              suggestionElement.classList.remove("selected-suggestion");
+            }
+
+            suggestionElement.addEventListener("click", function () {
+              answerInputElement.value = suggestion;
+              suggestionsContainer.innerHTML = "";
+              selectedSuggestionIndex = -1; // Reset the selected suggestion index after selecting a suggestion
+            });
+
+            suggestionsContainer.appendChild(suggestionElement);
+          });
+        }
+      });
+
+      // Additional code for displaying hints
+      function setupHints() {
+        const hintElement = document.createElement("div");
+        hintElement.id = "guess-hint";
+        hintElement.classList.add("guess-hint");
+        hintElement.style.display = "none"; // Hide the hint initially
+        document.body.appendChild(hintElement);
+      }
+
+      setupHints();
+
+      // Function to handle click on guess buttons and update currentImageNumber
+      function setupGuessButtons() {
+        const guessButtons = document.querySelectorAll(".guess-button");
+        guessButtons.forEach((button, index) => {
+          button.addEventListener("click", function () {
+            // Remove "font-bold" class from all guess buttons
+            guessButtons.forEach((btn) => {
+              btn.classList.remove("font-bold");
+            });
+
+            // Add "font-bold" class to the clicked button
+            this.classList.add("font-bold");
+
+            // Set currentImageNumber to the corresponding image number (index + 1)
+            currentImageNumber = index + 1;
+
+            // Update the image and hint based on the currentImageNumber
+            updateImage();
+          });
+        });
+      }
+
+      // Call setupGuessButtons to set up event listeners for guess buttons
+      setupGuessButtons();
+
+      // Define the function to update the currentQuestion
+function updateCurrentQuestion() {
+  currentQuestion = (currentQuestion + 1) % quizQuestions.length;
+  displayQuestion();
+}
+
+// Function to initialize the countdown and question update
+function initializeCountdownAndQuestionUpdate() {
+  const intervalDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  let lastUpdateTime = parseInt(getCookie('lastUpdateTime'));
+  let currentQuestion = parseInt(getCookie('currentQuestion'));
+
+  if (!lastUpdateTime || isNaN(lastUpdateTime)) {
+    lastUpdateTime = new Date().getTime();
+    setCookie('lastUpdateTime', lastUpdateTime, intervalDuration);
+
+    currentQuestion = 0;
+    setCookie('currentQuestion', currentQuestion, intervalDuration);
+  }
+
+  const currentTime = new Date().getTime();
+  const timeSinceLastUpdate = currentTime - lastUpdateTime;
+
+  if (timeSinceLastUpdate >= intervalDuration) {
+    // Update currentQuestion if 24 hours have passed
+    currentQuestion = (currentQuestion + 1) % quizQuestions.length;
+    setCookie('currentQuestion', currentQuestion, intervalDuration);
+
+    lastUpdateTime = currentTime - (timeSinceLastUpdate % intervalDuration);
+    setCookie('lastUpdateTime', lastUpdateTime, intervalDuration);
+  }
+
+  displayQuestion(currentQuestion); // Display the current question
+}
+
+// Call the function to initialize the countdown and question update
+initializeCountdownAndQuestionUpdate();
+
+// Function to set a cookie
+function setCookie(name, value, maxAge) {
+  const date = new Date();
+  date.setTime(date.getTime() + maxAge);
+  const expires = 'expires=' + date.toUTCString();
+  document.cookie = name + '=' + value + '; ' + expires + '; path=/';
+}
+
+// Function to get a cookie value by name
+function getCookie(name) {
+  const value = '; ' + document.cookie;
+  const parts = value.split('; ' + name + '=');
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift();
+  }
+}
+
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html>
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="icon"
+    href="https://cdn.jsdelivr.net/npm/twemoji@11.3.0/2/svg/1f4fd.svg"
+  />
+  <link
+    href="fonts/Burford-Marquee/style.css"
+    rel="stylesheet"
+    type="text/css"
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet"
+  />
+  <title>Guess the Movie Release Year</title>
+  <style>
+    a.kufi-button {
+      background-color: #29abe0;
+      border: 0 #fff !important;
+      border-radius: 7px;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+      color: #fff;
+      cursor: pointer;
+      display: inline-block !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      line-height: 36px !important;
+      min-width: 150px;
+      overflow-wrap: break-word;
+      padding: 0 12px !important;
+      text-align: center !important;
+      text-decoration: none;
+      text-shadow: none;
+      vertical-align: middle;
+    }
+
+    .kufi-right {
+      bottom: 15px;
+      min-width: 0 !important;
+      position: fixed;
+      right: 10px;
+    }
+
+    span.kufitext {
+      text-wrap: none;
+      letter-spacing: -0.15px !important;
+      line-height: 33px !important;
+      padding: 0;
+      text-align: center;
+      text-shadow: 0 1px 1px rgba(34, 34, 34, 0.05);
+      vertical-align: middle;
+    }
+
+    .kufitext img.kufiimg {
+      -webkit-animation: kufi-wiggle 3s infinite;
+      animation: kufi-wiggle 3s infinite;
+      display: initial;
+      height: 15px !important;
+      width: 22px !important;
+    }
+
+    .kufiimg:after,
+    img.kufiimg {
+      border: none;
+      margin-top: 0;
+      vertical-align: middle;
+    }
+
+    #timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      align-items: center;
+      width: 100%; /* Add this line */
+    }
+
+    .timeline-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .poster {
+      width: 100px;
+      height: auto;
+    }
+
+    .year-line {
+      width: 50px;
+      height: 1px;
+      background-color: black;
+      position: relative;
+    }
+
+    .actual-year,
+    .guess {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: white;
+      border-radius: 50%;
+    }
+
+    .line {
+      width: 3px;
+      height: 20px;
+      background-color: white;
+      position: absolute;
+      top: -20px;
+    }
+
+    .label {
+      position: absolute;
+      top: -45px;
+      left: -30px;
+      width: 100px;
+      text-align: center;
+      font-size: medium;
+    }
+
+    .actual-year {
+      left: 0;
+    }
+
+    .guess {
+      right: 0;
+    }
+
+    .dot-container {
+      position: absolute;
+      bottom: -175%;
+      transform: translateY(-130%);
+      font-weight: bold;
+    }
+
+    .dot-container-actual {
+      position: absolute;
+      bottom: -175%;
+      transform: translateY(-130%);
+      color: rgba(16, 185, 129, var(--tw-bg-opacity));
+      font-weight: bold;
+    }
+
+    .dot {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      border-color: white;
+      border-width: 3px;
+    }
+
+    @import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
+
+    .marquee {
+      background-color: #fff;
+      color: #000;
+      padding: 20px;
+      border: 10px solid #000;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), inset 0 0 50px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      text-align: center;
+      background-image: repeating-radial-gradient(
+        circle at 0 0,
+        #fff,
+        #fff 1px,
+        transparent 1px,
+        transparent 20px
+      );
+    }
+
+    .marquee-text {
+      font-weight: bold;
+      font-size: 2.5em;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .dotcaps {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      border-color: white;
+      border-width: 3px;
+      position: relative;
+      top: -20px;
+      background-color: rgba(185, 28, 28, var(--tw-bg-opacity));
+    }
+
+    .blur {
+      filter: blur(5px);
+    }
+
+    @keyframes shake {
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+      10%,
+      30%,
+      50%,
+      70%,
+      90% {
+        transform: translateX(-2px);
+      }
+      20%,
+      40%,
+      60%,
+      80% {
+        transform: translateX(2px);
+      }
+    }
+
+    .animate-shake {
+      animation: shake 0.5s ease-in-out;
+      border-color: red;
+    }
+
+    @keyframes slide {
+      0% {
+        transform: translateX(0);
+      }
+      50% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .slide-animation {
+      animation: slide 2s ease-in-out;
+    }
+  </style>
+  <body class="bg-red-700 text-white font-sans">
+    <a
+      href="https://kenhendricks.me"
+      class="absolute top-0 left-12 p-2 text-stone-300 rounded-br-lg rounded-bl-lg w-20 h-20 text-center justify-content text-4xl font-inter pt-4 transform transition duration-500 ease-in-out hover:-translate-y-1"
+      style="
+        background-color: rgb(28 25 23 / var(--tw-bg-opacity));
+        font-weight: bold;
+      "
+      >KH</a
+    >
+    <div class="container mx-auto px-4 pt-4">
+      <header class="marquee pt-4">
+        <hr />
+        <h1 class="marquee-text">
+          Guess the Movie Release Year
+          <hr />
+          <p id="movie" class="text-2xl mr-4"></p>
+        </h1>
+        <hr />
+      </header>
+      <div class="flex items-center justify-center mb-4">
+        <input
+          type="number"
+          id="guess"
+          min=""
+          max=""
+          class="p-2 rounded border border-white text-black w-20"
+          placeholder="Year"
+          oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+          maxlength="4"
+        />
+        <button
+          onclick="checkGuess()"
+          class="ml-4 px-4 py-2 rounded"
+          style="background-color: #c2e5e5; color: #1a3d3d; font-weight: bold"
+          id="guessButton"
+        >
+          Guess
+        </button>
+        <button
+          id="nextMovieButton"
+          class="ml-4 px-6 py-3 rounded text-white"
+          style="background-color: #4cb3b3"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-caret-right-fill"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="relative mx-auto">
+        <img
+          id="poster"
+          src=""
+          alt=""
+          class="mb-4 rounded-lg shadow-lg mx-auto z-10 backdrop-blur"
+        />
+        <p
+          id="result"
+          class="text-lg mb-4 text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
+        ></p>
+      </div>
+      <div id="spinner" style="display: none">Loading...</div>
+      <div class="pt-12 pb-4">
+        <div
+          id="timeline"
+          class="fixed bottom-0 left-0 w-full flex items-center justify-between border-t-4 border-white h-10 mb-4"
+        >
+          <!-- Timeline items will be added here -->
+        </div>
+
+        <template id="timeline-item-template">
+          <div class="timeline-item text-center mx-2">
+            <img class="poster" src="" alt="" />
+            <p class="title"></p>
+            <div class="year-line">
+              <!-- Actual year and guess will be added here -->
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+    <div class="py-5 text-center">
+      <div class="container max-w-screen-lg mx-auto">
+        <div>
+          <div class="flex flex-wrap justify-center gap-2">
+            <a
+              href="https://twitter.com/KenHendricksJr"
+              class="bg-stone-400 p-2 font-semibold text-white inline-flex items-center space-x-2 rounded-full"
+              ><svg
+                class="w-5 h-5 fill-current"
+                role="img"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+                ></path></svg></a
+            ><a
+              href="https://linkedin.com/in/kennethhendricksjr"
+              class="bg-stone-400 p-2 font-semibold text-white inline-flex items-center space-x-2 rounded-full"
+              ><svg
+                class="w-5 h-5 fill-current"
+                role="img"
+                viewBox="0 0 256 256"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g>
+                  <path
+                    d="M218.123122,218.127392 L180.191928,218.127392 L180.191928,158.724263 C180.191928,144.559023 179.939053,126.323993 160.463756,126.323993 C140.707926,126.323993 137.685284,141.757585 137.685284,157.692986 L137.685284,218.123441 L99.7540894,218.123441 L99.7540894,95.9665207 L136.168036,95.9665207 L136.168036,112.660562 L136.677736,112.660562 C144.102746,99.9650027 157.908637,92.3824528 172.605689,92.9280076 C211.050535,92.9280076 218.138927,118.216023 218.138927,151.114151 L218.123122,218.127392 Z M56.9550587,79.2685282 C44.7981969,79.2707099 34.9413443,69.4171797 34.9391618,57.260052 C34.93698,45.1029244 44.7902948,35.2458562 56.9471566,35.2436736 C69.1040185,35.2414916 78.9608713,45.0950217 78.963054,57.2521493 C78.9641017,63.090208 76.6459976,68.6895714 72.5186979,72.8184433 C68.3913982,76.9473153 62.7929898,79.26748 56.9550587,79.2685282 M75.9206558,218.127392 L37.94995,218.127392 L37.94995,95.9665207 L75.9206558,95.9665207 L75.9206558,218.127392 Z M237.033403,0.0182577091 L18.8895249,0.0182577091 C8.57959469,-0.0980923971 0.124827038,8.16056231 -0.001,18.4706066 L-0.001,237.524091 C0.120519052,247.839103 8.57460631,256.105934 18.8895249,255.9977 L237.033403,255.9977 C247.368728,256.125818 255.855922,247.859464 255.999,237.524091 L255.999,18.4548016 C255.851624,8.12438979 247.363742,-0.133792868 237.033403,0.000790807055"
+                  ></path>
+                </g></svg></a
+            ><a
+              href="https://github.com/kenhendricks00"
+              class="bg-stone-400 p-2 font-semibold text-white inline-flex items-center space-x-2 rounded-full"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                aria-hidden="true"
+                role="img"
+                class="w-5"
+                preserveAspectRatio="xMidYMid meet"
+                viewBox="0 0 24 24"
+              >
+                <g fill="none">
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385c.6.105.825-.255.825-.57c0-.285-.015-1.23-.015-2.235c-3.015.555-3.795-.735-4.035-1.41c-.135-.345-.72-1.41-1.23-1.695c-.42-.225-1.02-.78-.015-.795c.945-.015 1.62.87 1.845 1.23c1.08 1.815 2.805 1.305 3.495.99c.105-.78.42-1.305.765-1.605c-2.67-.3-5.46-1.335-5.46-5.925c0-1.305.465-2.385 1.23-3.225c-.12-.3-.54-1.53.12-3.18c0 0 1.005-.315 3.3 1.23c.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23c.66 1.65.24 2.88.12 3.18c.765.84 1.23 1.905 1.23 3.225c0 4.605-2.805 5.625-5.475 5.925c.435.375.81 1.095.81 2.22c0 1.605-.015 2.895-.015 3.3c0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
+                    fill="currentColor"
+                  ></path>
+                </g></svg
+            ></a>
+          </div>
+        </div>
+      </div>
+      <p class="text-sm mt-2 opacity-50">
+        &copy; 2023 Kenneth Hendricks. All rights reserved.
+      </p>
+    </div>
+    <a
+      class="kufi-button kufi-right"
+      href="https://ko-fi.com/kenhendricks"
+      target="_blank"
+      rel="noreferrer noopener external"
+      title=""
+      ><span class="kufitext"
+        ><img
+          src="https://storage.ko-fi.com/cdn/cup-border.png"
+          alt="support"
+          class="kufiimg"
+        />
+        Support</span
+      ></a
+    >
+    <script>
+      window.onload = function () {
+        document.getElementById("nextMovieButton").onclick = nextMovie;
+        setupMovie();
+      };
+
+      const movies = [
+        { title: "The Godfather", year: 1972 },
+        { title: "The Dark Knight", year: 2008 },
+        { title: "Pulp Fiction", year: 1994 },
+        { title: "The Shawshank Redemption", year: 1994 },
+        { title: "The Matrix", year: 1999 },
+        { title: "Forrest Gump", year: 1994 },
+        { title: "Star Wars: Episode IV - A New Hope", year: 1977 },
+        { title: "The Silence of the Lambs", year: 1991 },
+        {
+          title: "The Lord of the Rings: The Fellowship of the Ring",
+          year: 2001,
+        },
+        { title: "The Lion King", year: 1994 },
+        // Add more movies here
+      ];
+
+      function enableGuessButton() {
+        document.getElementById("guessButton").disabled = false;
+      }
+
+      async function nextMovie() {
+        // Clear the timeline
+        const timeline = document.getElementById("timeline");
+        timeline.innerHTML = "";
+
+        // Fetch a new movie and update the currentMovie variable
+        const newMovie = getRandomMovie(currentMovie);
+
+        // Clear the guess input
+        document.getElementById("guess").value = "";
+
+        document
+          .getElementById("guess")
+          .classList.remove("animate-shake", "border-red-500");
+
+        // Show the spinner
+        document.getElementById("spinner").style.display = "block";
+
+        // Wait for the movie poster to be fetched before updating the movie title
+        await getMoviePoster(newMovie.title);
+
+        // Hide the spinner
+        document.getElementById("spinner").style.display = "none";
+
+        document.getElementById("movie").innerText = newMovie.title;
+
+        // Reset the timeline for the new movie
+        currentMovie = newMovie;
+        setupMovie();
+
+        // Clear the result
+        document.getElementById("result").innerHTML = "";
+
+        // Blur the poster
+        document.getElementById("poster").classList.remove("blur");
+
+        // Re-enable the guess button
+        enableGuessButton();
+      }
+
+      // Shuffle the movies array to maintain correct associations
+      shuffleArray(movies);
+
+      // Initialize the game with the first movie
+      let currentMovie = movies[0];
+
+      // Display the current movie title and fetch its poster
+      document.getElementById("movie").innerText = currentMovie.title;
+      getMoviePoster(currentMovie.title);
+
+      function getRandomMovie(currentMovie) {
+        let newMovie;
+        do {
+          newMovie = movies[Math.floor(Math.random() * movies.length)];
+        } while (currentMovie && newMovie.title === currentMovie.title);
+        return newMovie;
+      }
+
+      let startYear;
+      let endYear;
+
+      function setupMovie() {
+        // Generate a random number between 15 and 30
+        const range = Math.floor(Math.random() * 15) + 15;
+
+        const rangediff = range / (Math.floor(Math.random() * 3) + 1);
+
+        startYear = Math.floor(
+          currentMovie.year - range / (Math.floor(Math.random() * 3) + 1)
+        );
+        endYear = Math.floor(
+          currentMovie.year + range / (Math.floor(Math.random() * 3) + 1)
+        );
+
+        // Ensure the start year is not less than 1888 (the year of the oldest known movie)
+        if (startYear < 1900) {
+          startYear = 1900;
+        }
+
+        // Ensure the end year does not exceed 2023
+        if (endYear > 2023) {
+          endYear = 2023;
+        }
+
+        // Set the min and max attributes of the input field
+        const guessInput = document.getElementById("guess");
+        guessInput.setAttribute("min", startYear);
+        guessInput.setAttribute("max", endYear);
+
+        // Set the movie title and range
+        document.getElementById(
+          "movie"
+        ).innerText = `${currentMovie.title} (${startYear} - ${endYear})`;
+
+        const timeline = document.getElementById("timeline");
+
+        // Create a dot for the start of the timeline
+        const startDot = document.createElement("div");
+        startDot.classList.add("dotcaps");
+        timeline.appendChild(startDot);
+
+        for (let year = startYear; year <= endYear; year++) {
+          const yearElement = document.createElement("div");
+          yearElement.classList.add("year", "mx-1");
+          timeline.appendChild(yearElement);
+        }
+
+        // Create a dot for the end of the timeline
+        const endDot = document.createElement("div");
+        endDot.classList.add("dotcaps");
+        timeline.appendChild(endDot);
+      }
+
+      function checkGuess() {
+        const guessInput = document.getElementById("guess");
+        const guess = document.getElementById("guess").value;
+        const result = document.getElementById("result");
+
+        // Check if guess is empty or out of range
+        if (!guess || guess < startYear || guess > endYear) {
+          guessInput.classList.add("animate-shake", "border-red-500");
+          return;
+        } else {
+          guessInput.classList.remove("animate-shake", "border-red-500");
+        }
+
+        if (guess == currentMovie.year) {
+          result.innerHTML = `<span class="text-white font-bold text-6xl" style="text-shadow: 2px 3px 5px rgba(0,0,0,0.5);">Correct!</span>`;
+        } else {
+          result.innerHTML = `<span class="text-white font-bold text-6xl" style="text-shadow: 2px 3px 5px rgba(0,0,0,0.5);">Incorrect.</span><br><p style="text-shadow: 2px 3px 5px rgba(0,0,0,0.5);">The movie was released in ${
+            currentMovie.year
+          }.<br>You were off by ${Math.abs(
+            currentMovie.year - guess
+          )} years.</p>`;
+        }
+
+        addTimelineItem(currentMovie, guess);
+
+        // Blur the poster
+        document.getElementById("poster").classList.add("blur");
+
+        // Disable the guess button
+        document.getElementById("guessButton").disabled = true;
+      }
+
+      function addTimelineItem(movie, guess) {
+        const timeline = document.getElementById("timeline");
+        const timelineItems = timeline.getElementsByClassName("year");
+
+        // Calculate the position for the actual year and guess on the timeline
+        const yearRange = endYear - startYear;
+        const actualPosition = Math.floor(
+          ((movie.year - startYear) / yearRange) * (timelineItems.length - 1)
+        );
+        const guessPosition = Math.floor(
+          ((guess - startYear) / yearRange) * (timelineItems.length - 1)
+        );
+
+        // Create a dot for the actual year
+        const actualDot = document.createElement("div");
+        actualDot.classList.add(
+          "dot",
+          "bg-green-500",
+          "slide-animation",
+          "slide-actual"
+        );
+
+        const actualYear = document.createElement("span");
+        actualYear.innerText = movie.year;
+
+        const actualElement = document.createElement("div");
+        actualElement.classList.add(
+          "dot-container-actual",
+          "flex",
+          "flex-col",
+          "items-center",
+          "z-10"
+        );
+        actualElement.appendChild(actualDot);
+        actualElement.appendChild(actualYear);
+
+        // Create a dot for the guessed year
+        const guessDot = document.createElement("div");
+        guessDot.classList.add("dot", "bg-white");
+
+        // Create a line for the guessed year
+        const guessLine = document.createElement("div");
+        guessLine.classList.add("line");
+        guessDot.appendChild(guessLine);
+
+        // Create a label for the guessed year
+        const guessLabel = document.createElement("span");
+        guessLabel.classList.add("label");
+        guessLabel.innerText = "Your Guess";
+        guessDot.appendChild(guessLabel);
+
+        const guessYear = document.createElement("span");
+        guessYear.innerText = guess;
+
+        const guessElement = document.createElement("div");
+        guessElement.classList.add(
+          "dot-container",
+          "flex",
+          "flex-col",
+          "items-center",
+          "z-0"
+        );
+        guessElement.appendChild(guessDot);
+        guessElement.appendChild(guessYear);
+
+        // Add the actual and guess elements to the timeline
+        timelineItems[actualPosition].appendChild(actualElement);
+        timelineItems[guessPosition].appendChild(guessElement);
+
+        // Ensure that the actual year dot doesn't pass the dotcaps
+        if (actualPosition < 1) {
+          // The actual year is too close to the beginning
+          timelineItems[1].appendChild(actualElement);
+        } else if (actualPosition > timelineItems.length - 2) {
+          // The actual year is too close to the end
+          timelineItems[timelineItems.length - 2].appendChild(actualElement);
+        }
+      }
+
+      function getMoviePoster(title) {
+        fetch(`http://www.omdbapi.com/?t=${title}&apikey=aa4fab42`)
+          .then((response) => response.json())
+          .then((data) => {
+            const poster = document.getElementById("poster");
+            if (data.Poster) {
+              poster.src = data.Poster;
+              poster.alt = `Poster of ${title}`;
+            } else {
+              poster.src = "";
+              poster.alt = "No poster available";
+            }
+          });
+      }
+
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+    </script>
+  </body>
+</html>
