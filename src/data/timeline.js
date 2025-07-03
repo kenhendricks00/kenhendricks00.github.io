@@ -1,7 +1,7 @@
 export default [
     {
         year: '2025',
-        title: "Pursuing Bachelor's Degree in Computer Science",
+        title: "Bachelor's Degree in Computer Science",
         duration: 'currently',
         details: 
             "I've completed my Associate's Degree in Computer Science and am now attending La Salle University to earn my Bachelor's. I'm diving deeper into topics like software engineering, algorithms, data structures, and cybersecurity while continuing to hone my programming skills and personal projects.",
