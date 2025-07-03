@@ -1,9 +1,20 @@
-name: Deploy
+# A more descriptive name for the workflow
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main
+
+# 1. Add concurrency control to prevent race conditions
+# Ensures that only the latest commit is deployed and cancels older runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# 2. Set default permissions for the GITHUB_TOKEN for enhanced security
+permissions:
+  contents: read # Default to read-only permissions
 
 jobs:
   build:
@@ -12,24 +23,20 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
+        uses: actions/checkout@v4
+        # 'persist-credentials: false' is the default and good practice
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'npm' # Use the built-in caching from setup-node
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      # The caching step is now handled by actions/setup-node@v4
+      # - name: Cache node modules ...
 
       - name: Install dependencies
+        # This action smartly uses 'npm ci' for faster, reliable installs
         uses: bahmutov/npm-install@v1
 
       - name: Build project
@@ -43,9 +50,14 @@ jobs:
 
   deploy:
     name: Deploy
+    # This job requires the build job to succeed first
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+
+    # 3. Grant write permissions only to the deploy job
+    permissions:
+      contents: write # Allow this job to push to the gh-pages branch
 
     steps:
       - name: Download artifact
@@ -55,7 +67,9 @@ jobs:
           path: ./dist
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        # 4. Updated to the latest major version of the action
+        uses: peaceiris/actions-gh-pages@v4
         with:
+          # The GITHUB_TOKEN is automatically provided by GitHub
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
