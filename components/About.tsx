@@ -66,48 +66,48 @@ const About = () => {
             
             <div className="timeline relative">
               {/* Timeline Line */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-secondary)] animate-growDown origin-top"></div>
+              <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-secondary)] animate-growDown origin-top z-2"></div>
               
               {/* Timeline Items */}
               <div className="timeline-item flex flex-col md:flex-row md:justify-between mb-16 animate-fadeIn">
-                <div className="timeline-date md:w-5/12 p-4 md:text-right">
+                <div className="timeline-date md:w-5/12 p-4 md:text-right relative z-20">
                   <h4 className="highlight text-xl font-bold">2025 - Present</h4>
                 </div>
-                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
-                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg">
+                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] z-30"></div>
+                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg relative z-20">
                   <h4 className="text-xl font-bold">Bachelor's Degree in Computer Science</h4>
                   <p className="text-gray-300">I've completed my Associate's Degree in Computer Science and am now attending La Salle University to earn my Bachelor's. I'm diving deeper into topics like software engineering, algorithms, data structures, and cybersecurity while continuing to hone my programming skills and personal projects.</p>
                 </div>
               </div>
               
               <div className="timeline-item flex flex-col md:flex-row md:justify-between mb-16">
-                <div className="timeline-date md:w-5/12 p-4 md:text-right">
+                <div className="timeline-date md:w-5/12 p-4 md:text-right relative z-20">
                   <h4 className="highlight text-xl font-bold">2023 - 2025</h4>
                 </div>
-                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
-                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg">
+                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] z-30"></div>
+                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg relative z-20">
                   <h4 className="text-xl font-bold">Associate's Degree in Computer Science</h4>
                   <p className="text-gray-300">I'm currently attending the Community College of Philadelphia and pursuing the knowledge that a computer science degree has to offer. I'm learning about computer architecture, computer science theory, an array of programming, and aspects of artificial intelligence.</p>
                 </div>
               </div>
               
               <div className="timeline-item flex flex-col md:flex-row md:justify-between mb-16">
-                <div className="timeline-date md:w-5/12 p-4 md:text-right">
+                <div className="timeline-date md:w-5/12 p-4 md:text-right relative z-20">
                   <h4 className="highlight text-xl font-bold">2014 - 2018</h4>
                 </div>
-                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
-                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg">
+                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] z-30"></div>
+                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg relative z-20">
                   <h4 className="text-xl font-bold">Highschool</h4>
                   <p className="text-gray-300">I attended New Foundations Charter Highschool, a college prep school, there I took an Engineering class where it was reinforced that I loved the idea of creating something that is useful to people, ultimately earning a 94 in this class.</p>
                 </div>
               </div>
               
               <div className="timeline-item flex flex-col md:flex-row md:justify-between animate-fadeIn" style={{animationDelay: '0.8s'}}>
-                <div className="timeline-date md:w-5/12 p-4 md:text-right">
+                <div className="timeline-date md:w-5/12 p-4 md:text-right relative z-20">
                   <h4 className="highlight text-xl font-bold">2011</h4>
                 </div>
-                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
-                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg">
+                <div className="timeline-dot absolute left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] z-30"></div>
+                <div className="timeline-content md:w-5/12 p-4 bg-black bg-opacity-50 rounded-lg relative z-20">
                   <h4 className="text-xl font-bold">First Line of Code</h4>
                   <p className="text-gray-300">I wrote my first line of real code that started this journey into digital craftsmanship that I never could've imagined, especially as someone who never saw themselves as anything other than a blue collar worker.</p>
                 </div>

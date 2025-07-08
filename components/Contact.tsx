@@ -66,7 +66,9 @@ const Contact = () => {
                 <FontAwesomeIcon icon={faEnvelope} className="text-[var(--color-primary)] text-xl mt-1" />
                 <div>
                   <h3 className="text-lg font-semibold mb-1">Email</h3>
-                  <p>ken@kenhendricks.me</p>
+                  <a href="mailto:ken@kenhendricks.me" className="text-gray-300 hover:text-[var(--color-primary)]">
+                        ken@kenhendricks.me
+                  </a>
                 </div>
               </div>
               
