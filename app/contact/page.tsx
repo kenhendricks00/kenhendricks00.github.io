@@ -1,12 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import Head from 'next/head';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import Navbar from '../../components/Navbar';
 
 export default function Contact() {
-  const searchParams = useSearchParams();
   
   interface FormData {
     name: string;
@@ -36,35 +33,7 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   
-  // Pre-fill form data from URL params (from quote modal redirect)
-  useEffect(() => {
-    if (searchParams) {
-      const service = searchParams.get('service');
-      const budget = searchParams.get('budget');
-      const timeline = searchParams.get('timeline');
-      const features = searchParams.get('features');
-      const businessGoal = searchParams.get('businessGoal');
-      
-      if (service || budget || timeline || features) {
-        setFormData((prev: FormData) => ({
-          ...prev,
-          service: service || '',
-          budget: budget || '',
-          timeline: timeline || '',
-          additionalFeatures: features ? features.split(',') : [],
-          subject: service ? `Quote Request: ${service}` : prev.subject,
-          message: `I'm interested in discussing a project with the following details:
-${businessGoal ? `\nBusiness Goal: ${businessGoal}` : ''}
-${service ? `\nService: ${service}` : ''}
-${budget ? `\nBudget: $${budget}` : ''}
-${timeline ? `\nTimeline: ${timeline}` : ''}
-${features ? `\nFeatures: ${features.replace(/,/g, ', ')}` : ''}
-
-`
-        }));
-      }
-    }
-  }, [searchParams]);
+  // Comment: Pre-fill functionality removed for static export compatibility
   
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -116,10 +85,7 @@ ${features ? `\nFeatures: ${features.replace(/,/g, ', ')}` : ''}
   
   return (
     <>
-      <Head>
-        <title>Contact | Kenneth Hendricks</title>
-        <meta name="description" content="Get in touch with Kenneth Hendricks for web development services, collaboration opportunities, or general inquiries." />
-      </Head>
+      {/* Metadata handled by app/contact/layout.tsx */}
       
       <Navbar />
       
