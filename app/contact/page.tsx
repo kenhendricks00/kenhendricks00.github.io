@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Navbar from '../../components/Navbar';
 
 export default function Contact() {
@@ -33,7 +33,37 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   
-  // Comment: Pre-fill functionality removed for static export compatibility
+  // Client-side only URL parameter handling for static export compatibility
+  useEffect(() => {
+    // Only run in browser, not during build
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const service = urlParams.get('service');
+      const budget = urlParams.get('budget');
+      const timeline = urlParams.get('timeline');
+      const features = urlParams.get('features');
+      const businessGoal = urlParams.get('businessGoal');
+      
+      if (service || budget || timeline || features) {
+        setFormData((prev) => ({
+          ...prev,
+          service: service || '',
+          budget: budget || '',
+          timeline: timeline || '',
+          additionalFeatures: features ? features.split(',') : [],
+          subject: service ? `Quote Request: ${service}` : prev.subject,
+          message: `I'm interested in discussing a project with the following details:
+${businessGoal ? `\nBusiness Goal: ${businessGoal}` : ''}
+${service ? `\nService: ${service}` : ''}
+${budget ? `\nBudget: $${budget}` : ''}
+${timeline ? `\nTimeline: ${timeline}` : ''}
+${features ? `\nFeatures: ${features.replace(/,/g, ', ')}` : ''}
+
+`
+        }));
+      }
+    }
+  }, []);  // Empty dependency array means this runs once on component mount
   
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
