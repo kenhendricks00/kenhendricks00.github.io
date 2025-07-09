@@ -62,11 +62,19 @@ export default function Services() {
   };
 
   const handleTimelineSelect = (timeline: string, additionalCost: number = 0) => {
-    // Reset any previous timeline cost first
+    // First calculate the base price without any timeline costs
+    // Start with the current total price
     let basePrice = quoteData.totalPrice;
-    if (quoteData.timeline === 'Express (~3-6 days)') basePrice -= 50;
-    else if (quoteData.timeline === 'Regular (~4-7 days)') basePrice -= 25;
     
+    // Remove any existing timeline cost based on the current timeline
+    if (quoteData.timeline === 'Express Timeline' || quoteData.timeline === 'Express (1-2 weeks)') {
+      basePrice -= 50;
+    } else if (quoteData.timeline === 'Regular Timeline' || quoteData.timeline === 'Regular (2-3 weeks)') {
+      basePrice -= 25;
+    }
+    // Standard Timeline has no additional cost, so no need to subtract anything
+    
+    // Update quote data with the new timeline and recalculated price
     setQuoteData({
       ...quoteData, 
       timeline,
