@@ -22,7 +22,7 @@ const projects = [
     category: "discord",
     tags: ["Python", "Discord.py", "API"],
     image: "/images/fixembed.jpg",
-    projectUrl: "https://discord.com/oauth2/authorize?client_id=1173820242305224764",
+    projectUrl: "https://www.kenhendricks.me/FixEmbed",
     codeUrl: "https://github.com/kenhendricks00/FixEmbed"
   },
   {
