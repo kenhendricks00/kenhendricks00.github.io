@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
@@ -18,7 +18,12 @@ export default function Services() {
     features: [] as string[],
     budget: '',
     timeline: '',
-    totalPrice: 95 // Base price starts at $95
+    totalPrice: 95, // Base price starts at $95
+    promoCode: '',
+    discountAmount: 0,
+    discountApplied: false,
+    maintenancePlan: 'none', // 'none', 'standard', or 'premium'
+    maintenancePrice: 0, // Monthly price of selected plan
   });
   
   const toggleService = (serviceId: string) => {
@@ -46,41 +51,76 @@ export default function Services() {
   };
 
   const handleFeatureToggle = (feature: string, price: number) => {
+    // Store the current discount state
+    const discountApplied = quoteData.discountApplied;
+    const discountAmount = quoteData.discountAmount;
+    
+    let newPrice;
+    let newFeatures;
+    
     if (quoteData.additionalFeatures.includes(feature)) {
+      newFeatures = quoteData.additionalFeatures.filter(f => f !== feature);
+      
+      // Calculate the new base price (without discount)
+      const newBasePrice = (quoteData.totalPrice + (discountApplied ? discountAmount : 0)) - price;
+      
+      // Calculate the new discount amount if applicable
+      const newDiscountAmount = discountApplied ? Math.round(newBasePrice * 0.1) : 0;
+      
+      // Apply the discount to get the final price
+      newPrice = discountApplied ? newBasePrice - newDiscountAmount : newBasePrice;
+      
       setQuoteData({
         ...quoteData, 
-        additionalFeatures: quoteData.additionalFeatures.filter(f => f !== feature),
-        totalPrice: quoteData.totalPrice - price
+        additionalFeatures: newFeatures,
+        totalPrice: newPrice,
+        discountAmount: discountApplied ? newDiscountAmount : 0
       });
     } else {
+      newFeatures = [...quoteData.additionalFeatures, feature];
+      
+      // Calculate the new base price (without discount)
+      const newBasePrice = (quoteData.totalPrice + (discountApplied ? discountAmount : 0)) + price;
+      
+      // Calculate the new discount amount if applicable
+      const newDiscountAmount = discountApplied ? Math.round(newBasePrice * 0.1) : 0;
+      
+      // Apply the discount to get the final price
+      newPrice = discountApplied ? newBasePrice - newDiscountAmount : newBasePrice;
+      
       setQuoteData({
         ...quoteData, 
-        additionalFeatures: [...quoteData.additionalFeatures, feature],
-        totalPrice: quoteData.totalPrice + price
+        additionalFeatures: newFeatures,
+        totalPrice: newPrice,
+        discountAmount: discountApplied ? newDiscountAmount : 0
       });
     }
   };
 
   const handleTimelineSelect = (timeline: string, additionalCost: number = 0) => {
-    // First calculate the base price without any timeline costs
-    // Start with the current total price
     let basePrice = quoteData.totalPrice;
-    
-    // Remove any existing timeline cost based on the current timeline
+    const discountApplied = quoteData.discountApplied;
+    const discountAmount = quoteData.discountAmount;
+    if (discountApplied) {
+      basePrice = basePrice + discountAmount;
+    }
     if (quoteData.timeline === 'Express Timeline' || quoteData.timeline === 'Express (1-2 weeks)') {
       basePrice -= 50;
     } else if (quoteData.timeline === 'Regular Timeline' || quoteData.timeline === 'Regular (2-3 weeks)') {
       basePrice -= 25;
     }
-    // Standard Timeline has no additional cost, so no need to subtract anything
-    
+    let newBasePrice = basePrice + additionalCost;
+    let finalPrice = newBasePrice;
+    if (discountApplied) {
+      finalPrice = newBasePrice - discountAmount;
+    }
     // Update quote data with the new timeline and recalculated price
     setQuoteData({
       ...quoteData, 
       timeline,
-      totalPrice: basePrice + additionalCost
+      totalPrice: finalPrice
     });
-    setCurrentStep(4);
+    setCurrentStep(4); // Go to maintenance plan step
   };
 
   const submitQuote = () => {
@@ -93,11 +133,68 @@ export default function Services() {
     params.append('timeline', quoteData.timeline);
     params.append('features', quoteData.additionalFeatures.join(','));
     params.append('businessGoal', quoteData.businessGoal);
+    params.append('maintenancePlan', quoteData.maintenancePlan);
+    if (quoteData.maintenancePlan !== 'none') {
+      params.append('maintenancePrice', quoteData.maintenancePrice.toString());
+    }
     
     closeQuoteModal();
     
     // Redirect to contact page with the quote data
     router.push(`/contact?${params.toString()}`);
+  };
+  
+  const applyPromoCode = () => {
+    // Prevent applying discount if already applied
+    if (quoteData.discountApplied) {
+      alert('Promo code has already been applied');
+      return;
+    }
+    
+    // Check if the promo code is valid
+    if (quoteData.promoCode.toUpperCase() === 'FRIEND10') {
+      // Calculate 10% discount
+      const basePrice = quoteData.totalPrice;
+      const discount = Math.round(basePrice * 0.1); // 10% discount rounded to nearest dollar
+      
+      setQuoteData({
+        ...quoteData,
+        discountAmount: discount,
+        discountApplied: true,
+        totalPrice: basePrice - discount
+      });
+    } else {
+      // Invalid promo code
+      setQuoteData({
+        ...quoteData,
+        discountApplied: false
+      });
+      alert('Invalid promo code');
+    }
+  };
+
+  const handlePromoCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuoteData({
+      ...quoteData,
+      promoCode: e.target.value
+    });
+  };
+
+  const selectMaintenancePlan = (plan: 'none' | 'standard' | 'premium') => {
+    const planPrices = {
+      'none': 0,
+      'standard': 20,
+      'premium': 40
+    };
+    
+    setQuoteData({
+      ...quoteData,
+      maintenancePlan: plan,
+      maintenancePrice: planPrices[plan]
+    });
+    
+    // Automatically advance to the next step after selection
+    setCurrentStep(5);
   };
   
   const saveQuoteForLater = () => {
@@ -330,31 +427,29 @@ export default function Services() {
         <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex justify-center items-center pt-16 pb-8 px-4">
           <div className="bg-[#0a0a0a] max-w-2xl w-full rounded-lg shadow-xl max-h-[85vh] relative">
             <div className="p-6 overflow-y-auto custom-scrollbar" style={{ maxHeight: 'calc(85vh - 2rem)' }}>
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold">Get Your Estimate</h3>
-                <button 
-                  onClick={closeQuoteModal}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </button>
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="relative mb-8">
-                <div className="w-full h-2 bg-gray-700 rounded-full">
+              <div className="quote-modal-header">
+                <div className="flex justify-between items-center">
+                  <h1 className="text-2xl font-bold">Get Your Estimate</h1>
+                  <button 
+                    onClick={closeQuoteModal}
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="progress-bar mt-4">
                   <div 
-                    className="h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300"
-                    style={{ width: `${(currentStep / 4) * 100}%` }}
+                    className="progress-fill" 
+                    style={{
+                      width: `${(currentStep / 5) * 100}%`,
+                      background: 'linear-gradient(to right, #8B5CF6, #3B82F6)',
+                    }}
                   ></div>
                 </div>
-                <div className="absolute top-4 right-0 text-sm text-gray-400">
-                  Step {currentStep} of 4
-                </div>
+                <p className="text-right text-sm text-gray-400 mt-1">Step {currentStep} of 5</p>
               </div>
-              
               {/* Modal Content - Different for each step */}
               {currentStep === 1 && (
                 <div className="step-content space-y-6">
@@ -598,8 +693,136 @@ export default function Services() {
               
               {currentStep === 4 && (
                 <div className="step-content space-y-6">
-                  <h2 className="text-xl font-semibold">Your Quote Summary</h2>
-                  <p className="text-gray-400">Review your custom website quote</p>
+                  <h2 className="text-xl font-semibold">Choose your post-launch maintenance option:</h2>
+                  <p className="text-gray-400">The first 3 months of maintenance are included for free.</p>
+                  
+                  <div className="space-y-4 mt-6">
+                    {/* No Maintenance Option */}
+                    <div 
+                      className={`border ${quoteData.maintenancePlan === 'none' ? 'border-purple-500' : 'border-gray-700'} rounded-lg p-5 cursor-pointer hover:border-purple-500 transition-colors`}
+                      onClick={() => selectMaintenancePlan('none')}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium">No Maintenance</h3>
+                        <span className="text-md font-medium text-gray-400">$0/month</span>
+                      </div>
+                      <p className="text-sm text-gray-400 mt-1">You'll manage updates, bug fixes, and content edits on your own.</p>
+                    </div>
+                    
+                    {/* Standard Plan */}
+                    <div 
+                      className={`border ${quoteData.maintenancePlan === 'standard' ? 'border-purple-500' : 'border-gray-700'} rounded-lg p-5 cursor-pointer hover:border-purple-500 transition-colors`}
+                      onClick={() => selectMaintenancePlan('standard')}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium">Standard Plan</h3>
+                        <span className="text-md font-medium text-purple-400">$20/month</span>
+                      </div>
+                      <div className="mt-2">
+                        <p className="font-medium text-sm text-gray-300 mb-2">Includes:</p>
+                        <ul className="text-sm space-y-1 text-gray-400">
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            2 content edits/month (text, images, layout tweaks)
+                          </li>
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            Bug fixes & stack updates
+                          </li>
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            SEO & performance checks
+                          </li>
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            Email support (48-hour response)
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    {/* Premium Plan */}
+                    <div 
+                      className={`border ${quoteData.maintenancePlan === 'premium' ? 'border-purple-500' : 'border-gray-700'} rounded-lg p-5 cursor-pointer hover:border-purple-500 transition-colors`}
+                      onClick={() => selectMaintenancePlan('premium')}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium">Premium Plan</h3>
+                        <span className="text-md font-medium text-purple-400">$40/month</span>
+                      </div>
+                      <div className="mt-2">
+                        <p className="font-medium text-sm text-gray-300 mb-2">Includes everything in Standard, plus:</p>
+                        <ul className="text-sm space-y-1 text-gray-400">
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            Priority support (24-hour response)
+                          </li>
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            Uptime monitoring
+                          </li>
+                          <li className="flex items-center">
+                            <span className="text-purple-400 mr-2">•</span>
+                            Monthly report & insights
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#0d121f] rounded-lg p-4 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Updated Estimate:</span>
+                      <span className="text-xl font-bold">${quoteData.totalPrice}</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">Base price + features + timeline adjustment + maintenance options</p>
+                  </div>
+                  
+                  <div className="flex justify-between mt-8">
+                    <button 
+                      onClick={() => setCurrentStep(3)}
+                      className="btn btn-outline"
+                    >
+                      Back
+                    </button>
+                    <button 
+                      onClick={() => setCurrentStep(5)}
+                      className="btn btn-primary"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {currentStep === 5 && (
+                <div className="step-content space-y-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-xl font-semibold">Your Quote Summary</h2>
+                      <p className="text-gray-400">Review your custom website quote</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <div className="flex rounded-md overflow-hidden">
+                        <input 
+                          type="text" 
+                          className="bg-[#181818] border-0 px-3 py-2 w-36 text-sm focus:outline-none rounded-l-md" 
+                          placeholder="Promo Code"
+                          value={quoteData.promoCode}
+                          onChange={handlePromoCodeChange}
+                        />
+                        <button 
+                          onClick={applyPromoCode}
+                          className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] text-white px-6 py-2 text-sm transition-all hover:opacity-90 border-0 rounded-r-md"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                      {quoteData.discountApplied && (
+                        <p className="text-green-400 text-xs mt-1">10% discount applied!</p>
+                      )}
+                    </div>
+                  </div>
                   
                   <div className="bg-gray-900 rounded-lg p-6 mt-4">
                     <div className="space-y-4">
@@ -630,19 +853,67 @@ export default function Services() {
                         )}
                       </div>
                       
+                      {quoteData.maintenancePlan !== 'none' && (
+                        <div className="border-b border-gray-700 pb-4">
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-lg font-medium mb-1">Maintenance Plan</h3>
+                            <span className="text-sm text-gray-400">✅ First 3 months free</span>
+                          </div>
+                          <div className="text-sm">
+                            <p className="font-medium text-purple-400">
+                              {quoteData.maintenancePlan === 'standard' ? 'Standard Plan' : 'Premium Plan'} - ${quoteData.maintenancePrice}/month
+                            </p>
+
+                            
+                            {quoteData.maintenancePlan === 'standard' && (
+                              <ul className="mt-2">
+                                <li className="flex items-center"><span className="text-green-400 mr-2">•</span> 2 content edits/month</li>
+                                <li className="flex items-center"><span className="text-green-400 mr-2">•</span> Bug fixes & stack updates</li>
+                                <li className="flex items-center"><span className="text-green-400 mr-2">•</span> Email support (48h response)</li>
+                              </ul>
+                            )}
+                            
+                            {quoteData.maintenancePlan === 'premium' && (
+                              <ul className="mt-2">
+                                <li className="flex items-center"><span className="text-green-400 mr-2">•</span> Priority support (24h response)</li>
+                                <li className="flex items-center"><span className="text-green-400 mr-2">•</span> Includes all Standard features</li>
+                                <li className="flex items-center"><span className="text-green-400 mr-2">•</span> Uptime monitoring & monthly reports</li>
+                              </ul>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+
+                      
                       <div className="pt-2">
                         <div className="flex items-center justify-between">
                           <span className="text-lg font-medium">Total Estimated Price:</span>
-                          <span className="text-2xl font-bold text-purple-400">${quoteData.totalPrice}</span>
+                          <div className="text-right">
+                            {quoteData.discountApplied && (
+                              <div className="flex flex-col">
+                                <span className="text-sm text-gray-400 line-through">${quoteData.totalPrice + quoteData.discountAmount}</span>
+                                <span className="text-3xl font-bold text-purple-500">${quoteData.totalPrice}</span>
+                              </div>
+                            )}
+                            {!quoteData.discountApplied && (
+                              <span className="text-3xl font-bold text-purple-500">${quoteData.totalPrice}</span>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">Final pricing may vary based on project specifics</p>
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs text-gray-400">Final pricing may vary based on project specifics</p>
+                          {quoteData.discountApplied && (
+                            <p className="text-green-400 text-sm">10% discount applied!</p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex flex-col md:flex-row gap-4 justify-between mt-8">
                     <button 
-                      onClick={() => setCurrentStep(3)}
+                      onClick={() => setCurrentStep(4)}
                       className="btn btn-outline"
                     >
                       Back
