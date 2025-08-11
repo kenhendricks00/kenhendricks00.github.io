@@ -15,6 +15,9 @@ export default function Contact() {
     timeline: string;
     additionalFeatures: string[];
     totalQuote: string;
+    maintenancePlan: string;
+    promoCode: string;
+    discountAmount: string;
   }
   
   const [formData, setFormData] = useState<FormData>({
@@ -26,7 +29,10 @@ export default function Contact() {
     budget: '',
     timeline: '',
     additionalFeatures: [],
-    totalQuote: ''
+    totalQuote: '',
+    maintenancePlan: '',
+    promoCode: '',
+    discountAmount: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -45,14 +51,20 @@ export default function Contact() {
         const timeline = urlParams.get('timeline');
         const features = urlParams.get('features');
         const businessGoal = urlParams.get('businessGoal');
+        const maintenancePlan = urlParams.get('maintenancePlan');
+        const promoCode = urlParams.get('promoCode');
+        const discountAmount = urlParams.get('discountAmount');
         
-        if (service || budget || timeline || features) {
+        if (service || budget || timeline || features || maintenancePlan || promoCode) {
           setFormData(prev => ({
             ...prev,
             service: service || '',
             budget: budget || '',
             timeline: timeline || '',
             additionalFeatures: features ? features.split(',') : [],
+            maintenancePlan: maintenancePlan || '',
+            promoCode: promoCode || '',
+            discountAmount: discountAmount || '',
             subject: service ? `Quote Request: ${service}` : prev.subject,
             message: `I'm interested in discussing a project with the following details:
 ${businessGoal ? `\nBusiness Goal: ${businessGoal}` : ''}
@@ -60,6 +72,9 @@ ${service ? `\nService: ${service}` : ''}
 ${budget ? `\nBudget: $${budget}` : ''}
 ${timeline ? `\nTimeline: ${timeline}` : ''}
 ${features ? `\nFeatures: ${features.replace(/,/g, ', ')}` : ''}
+${maintenancePlan && maintenancePlan !== 'none' ? `\nMaintenance Plan: ${maintenancePlan.charAt(0).toUpperCase() + maintenancePlan.slice(1)} Plan` : ''}
+${promoCode ? `\nPromo Code Applied: ${promoCode}` : ''}
+${discountAmount ? `\nDiscount Amount: $${discountAmount}` : ''}
 
 `
           }));
@@ -111,7 +126,10 @@ ${features ? `\nFeatures: ${features.replace(/,/g, ', ')}` : ''}
           budget: '',
           timeline: '',
           additionalFeatures: [],
-          totalQuote: ''
+          totalQuote: '',
+          maintenancePlan: '',
+          promoCode: '',
+          discountAmount: ''
         });
       } else {
         const result = await response.json();
@@ -285,6 +303,20 @@ ${features ? `\nFeatures: ${features.replace(/,/g, ', ')}` : ''}
                         {formData.additionalFeatures && formData.additionalFeatures.length > 0 && (
                           <div className="md:col-span-2">
                             <span className="text-gray-400">Selected Features:</span> {formData.additionalFeatures.join(', ')}
+                          </div>
+                        )}
+                        {formData.maintenancePlan && formData.maintenancePlan !== 'none' && (
+                          <div className="md:col-span-2">
+                            <span className="text-gray-400">Maintenance Plan:</span> {formData.maintenancePlan.charAt(0).toUpperCase() + formData.maintenancePlan.slice(1)} Plan
+                            <span className="ml-2 text-green-500 text-xs">✓ First 3 months free</span>
+                          </div>
+                        )}
+                        {formData.promoCode && (
+                          <div className="md:col-span-2 mt-2 pt-2 border-t border-blue-800">
+                            <span className="text-gray-400">Promo Code:</span> {formData.promoCode}
+                            {formData.discountAmount && (
+                              <span className="ml-4 text-green-500">Discount: ${formData.discountAmount}</span>
+                            )}
                           </div>
                         )}
                       </div>
