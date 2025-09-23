@@ -174,8 +174,8 @@ ${discountAmount ? `\nDiscount Amount: $${discountAmount}` : ''}
                     </div>
                     <div>
                       <h3 className="font-medium">Email</h3>
-                      <a href="mailto:ken@kenhendricks.me" className="text-gray-300 hover:text-[var(--color-primary)]">
-                        ken@kenhendricks.me
+                      <a href="mailto:hello@kenhendricks.me" className="text-gray-300 hover:text-[var(--color-primary)]">
+                        hello@kenhendricks.me
                       </a>
                     </div>
                   </div>
