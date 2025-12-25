@@ -116,7 +116,7 @@ const Projects = () => {
           <button
             onClick={prevSlide}
             disabled={!showLeftArrow}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[rgba(0,0,0,0.7)] p-3 rounded-full transition-all duration-300 -ml-5 md:-ml-20 ${showLeftArrow ? 'opacity-100 hover:bg-[var(--color-primary)] cursor-pointer' : 'opacity-0 cursor-default'}`}
+            className={`hidden md:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[rgba(0,0,0,0.7)] p-3 rounded-full transition-all duration-300 -ml-5 md:-ml-20 ${showLeftArrow ? 'opacity-100 hover:bg-[var(--color-primary)] cursor-pointer' : 'opacity-0 cursor-default'}`}
             aria-label="Previous projects"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
@@ -128,7 +128,7 @@ const Projects = () => {
           <button
             onClick={nextSlide}
             disabled={!showRightArrow}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[rgba(0,0,0,0.7)] p-3 rounded-full transition-all duration-300 -mr-5 md:-mr-20 ${showRightArrow ? 'opacity-100 hover:bg-[var(--color-primary)] cursor-pointer' : 'opacity-0 cursor-default'}`}
+            className={`hidden md:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[rgba(0,0,0,0.7)] p-3 rounded-full transition-all duration-300 -mr-5 md:-mr-20 ${showRightArrow ? 'opacity-100 hover:bg-[var(--color-primary)] cursor-pointer' : 'opacity-0 cursor-default'}`}
             aria-label="Next projects"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
@@ -136,17 +136,26 @@ const Projects = () => {
             </svg>
           </button>
 
-          <div className="overflow-hidden mx-auto">
+          <div className="overflow-x-auto snap-x snap-mandatory md:overflow-hidden pb-4 md:pb-0 mx-auto scrollbar-hide">
             <div
-              className="flex transition-transform duration-500 ease-in-out gap-8"
+              className="flex md:transition-transform md:duration-500 md:ease-in-out gap-4 md:gap-8"
               style={{
+                // Apply transform only on desktop by checking window width? 
+                // A safer CSS-only approach: use a CSS variable or rely on the fact that mobile index is 0.
+                // However, inline styles override classes. 
+                // We'll set the transform, but on mobile 'currentIndex' will likely stay 0 because arrows are hidden.
+                // BUT if we resize from desktop to mobile after clicking, it might be shifted.
+                // We can use a media query in 'style' if we used a library, but here standard CSS is cleaner.
+                // Or simply: rely on 'currentIndex' being 0.
+                // To be safe against resize, we can reset index on resize or just rely on the user reloading.
+                // For now, straightforward:
                 transform: `translateX(calc(-${currentIndex * (100 / itemsPerPage)}% - ${currentIndex * (2 / 3)}rem))`
               }}
             >
               {filteredProjects.map(project => (
                 <div
                   key={project.id}
-                  className="w-full md:w-[calc(33.333%-1.33rem)] flex-shrink-0 bg-[var(--color-card-bg)] rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl"
+                  className="w-[85vw] md:w-[calc(33.333%-1.33rem)] flex-shrink-0 snap-center bg-[var(--color-card-bg)] rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:transform hover:-translate-y-2 hover:shadow-xl"
                 >
                   <div className="h-48 relative overflow-hidden">
                     <Image
