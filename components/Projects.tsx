@@ -44,6 +44,16 @@ const projects = [
     image: "/images/kentools.jpg",
     projectUrl: "https://ken.tools",
     codeUrl: "https://github.com/kenhendricks00/ken"
+  },
+  {
+    id: 5,
+    title: "Mindful Shores",
+    description: "Improving Mental Health Services in the Caribbean.",
+    category: "web",
+    tags: ["Web Design", "Frontend", "Client Project"],
+    image: "/images/mindfulshores.jpg",
+    projectUrl: "https://www.mindfulshores.org/",
+    codeUrl: ""
   }
 ];
 
