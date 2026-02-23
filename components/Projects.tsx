@@ -49,7 +49,7 @@ const projects = [
     id: 5,
     title: "Mindful Shores",
     description: "Improving Mental Health Services in the Caribbean.",
-    category: "web",
+    category: "client",
     tags: ["Web Design", "Frontend", "Client Project"],
     image: "/images/mindfulshores.jpg",
     projectUrl: "https://www.mindfulshores.org/",
@@ -105,6 +105,12 @@ const Projects = () => {
             onClick={() => setFilter('web')}
           >
             Web Development
+          </button>
+          <button
+            className={`filter-btn px-5 py-2 rounded-full ${filter === 'client' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]' : 'bg-[var(--color-neutral)]'}`}
+            onClick={() => setFilter('client')}
+          >
+            Client Projects
           </button>
           <button
             className={`filter-btn px-5 py-2 rounded-full ${filter === 'discord' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)]' : 'bg-[var(--color-neutral)]'}`}
