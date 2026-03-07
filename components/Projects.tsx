@@ -61,7 +61,7 @@ const projects = [
     description: "Insights and tutorials on software development and design.",
     category: "web",
     tags: ["Blog", "Writing", "tech"],
-    image: "/images/blog-thumbnail.jpg",
+    image: "/images/blog.jpg",
     projectUrl: "https://www.kenhendricks.me/blog/",
     codeUrl: ""
   }
