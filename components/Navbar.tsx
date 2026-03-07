@@ -37,11 +37,12 @@ const Navbar = () => {
           <li><Link href="/" className="active" onClick={() => setIsMenuActive(false)}>Home</Link></li>
           <li><Link href="/#about" onClick={() => setIsMenuActive(false)}>About</Link></li>
           <li><Link href="/#projects" onClick={() => setIsMenuActive(false)}>Projects</Link></li>
+          <li><Link href="https://www.kenhendricks.me/blog/" onClick={() => setIsMenuActive(false)}>Blog</Link></li>
           <li><Link href="/#skills" onClick={() => setIsMenuActive(false)}>Skills</Link></li>
           <li><Link href="/#contact" onClick={() => setIsMenuActive(false)}>Contact</Link></li>
           <li>
-            <Link 
-              href="/services" 
+            <Link
+              href="/services"
               onClick={() => setIsMenuActive(false)}
               className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] px-4 py-2 rounded-md hover:brightness-110 hover:text-white transition-all"
             >

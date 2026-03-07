@@ -54,6 +54,16 @@ const projects = [
     image: "/images/mindfulshores.jpg",
     projectUrl: "https://www.mindfulshores.org/",
     codeUrl: ""
+  },
+  {
+    id: 6,
+    title: "Ken's Blog",
+    description: "Insights and tutorials on software development and design.",
+    category: "web",
+    tags: ["Blog", "Writing", "tech"],
+    image: "/images/blog-thumbnail.jpg",
+    projectUrl: "https://www.kenhendricks.me/blog/",
+    codeUrl: ""
   }
 ];
 
