@@ -64,6 +64,16 @@ const projects = [
     image: "/images/blog.jpg",
     projectUrl: "https://www.kenhendricks.me/blog/",
     codeUrl: ""
+  },
+  {
+    id: 7,
+    title: "Partycord",
+    description: "Turn your browser into a Game Night.",
+    category: "web",
+    tags: ["Party", "Fun", "Discord"],
+    image: "/images/partycord.jpg",
+    projectUrl: "https://www.partycord.xyz/",
+    codeUrl: ""
   }
 ];
 
